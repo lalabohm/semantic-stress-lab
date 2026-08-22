@@ -1,110 +1,114 @@
-# Metodologia
+# Methodology
 
-## Hipótese central
+## Core hypothesis
 
-Complexidade sintático-literária — hipérbato, neologismo, metáfora, paradoxo —
-degrada a fidelidade semântica de embeddings e induz falhas de raciocínio em
-LLMs durante tarefas de interpretação, mesmo quando o conteúdo proposicional
-do texto é preservado. Testamos isso comparando cada fragmento literário
-original a uma "tradução intralingual" — uma reescrita em português
-contemporâneo, sintaticamente direta, que remove o fenômeno estudado sem
-alterar o que é dito.
+Literary syntactic complexity — hyperbaton, neologism, metaphor, paradox —
+degrades the semantic fidelity of embeddings and induces reasoning failures
+in LLMs during interpretation tasks, even when the propositional content of
+the text is preserved. We test this by comparing each original literary
+fragment to an "intralingual translation" — a syntactically direct rewrite
+in contemporary Portuguese that removes the studied phenomenon without
+changing what is said.
 
-Se a hipótese for correta, o par (original, simplificado) deve se comportar
-de forma assimetricamente pior para o original em duas frentes independentes:
-geometria de embeddings (Fase 1) e interpretação por LLMs (Fase 2).
+If the hypothesis holds, the (original, simplified) pair should behave
+asymmetrically worse for the original along two independent fronts:
+embedding geometry (Phase 1) and LLM interpretation (Phase 2).
 
-## Protocolo de tradução intralingual
+## Intralingual translation protocol
 
-A "tradução intralingual" é o par produzido para cada fragmento original e é
-o insumo mais sensível do experimento: se ela não for de fato equivalente em
-conteúdo proposicional, qualquer diferença medida na Fase 1/Fase 2 pode
-refletir divergência de conteúdo, não a complexidade sintática em si. O
-protocolo, portanto, prioriza a equivalência semântica acima de fluência ou
-elegância.
+The "intralingual translation" is the pair produced for each original
+fragment, and it is the most sensitive input of the experiment: if it isn't
+actually equivalent in propositional content, any difference measured in
+Phase 1/Phase 2 could reflect content divergence rather than syntactic
+complexity itself. The protocol therefore prioritizes semantic equivalence
+over fluency or elegance.
 
-**Objetivo da reescrita**: preservar o que o texto afirma, pergunta, nega ou
-implica logicamente, enquanto se remove o fenômeno linguístico marcado
-(`fenomeno_linguistico`) — reordenando sintaxe hiperbática para ordem direta
-SVO, substituindo neologismos por paráfrase em vocabulário corrente,
-explicitando o sentido literal por trás da metáfora, resolvendo a tensão
-aparente do paradoxo em linguagem direta.
+**Goal of the rewrite**: preserve what the text asserts, asks, denies, or
+logically implies, while removing the marked linguistic phenomenon
+(`fenomeno_linguistico`) — reordering hyperbatic syntax into direct SVO
+order, replacing neologisms with a paraphrase in current vocabulary, making
+the literal sense behind a metaphor explicit, resolving the apparent
+tension of a paradox in direct language.
 
-**Checagem de equivalência — entailment bidirecional**: antes de um par
-entrar no dataset final, o anotador (e, na revisão, um segundo anotador)
-deve poder afirmar as duas direções de implicação lógica:
+**Equivalence check — bidirectional entailment**: before a pair enters the
+final dataset, the annotator (and, during review, a second annotator) must
+be able to assert both directions of logical implication:
 
-1. `texto_original` implica `texto_simplificado` — nada foi acrescentado na
-   simplificação que não estivesse (ainda que implicitamente) no original.
-2. `texto_simplificado` implica `texto_original` — nada do conteúdo do
-   original foi perdido ou enfraquecido na simplificação.
+1. `texto_original` entails `texto_simplificado` — nothing was added in the
+   simplification that wasn't (even if implicitly) in the original.
+2. `texto_simplificado` entails `texto_original` — nothing from the
+   original's content was lost or weakened in the simplification.
 
-Quando o anotador não consegue sustentar as duas direções com confiança, o
-par não é "boa tradução intralingual" — ver critérios detalhados em
-`docs/ANNOTATION_GUIDE.md`. O campo `nivel_confianca_equivalencia`
-(escala 1–5) registra o grau de confiança nessa checagem bidirecional, e
-`anotador_revisao` registra quem forneceu a segunda opinião.
+When the annotator can't confidently support both directions, the pair is
+not a "good intralingual translation" — see detailed criteria in
+`docs/ANNOTATION_GUIDE.md`. The `nivel_confianca_equivalencia` field
+(1–5 scale) records confidence in this bidirectional check, and
+`anotador_revisao` records who provided the second opinion.
 
-Este protocolo é deliberadamente humano nesta fase do projeto. Uma checagem
-automática de entailment (ex. via um modelo de NLI ou um LLM-juiz) é uma
-extensão possível para validar em escala os pares já anotados, mas não
-substitui a anotação humana como critério de inclusão no dataset.
+This protocol is deliberately human-driven at this stage of the project. An
+automated entailment check (e.g. via an NLI model or an LLM judge) is a
+possible extension to validate already-annotated pairs at scale, but it
+does not replace human annotation as the inclusion criterion for the
+dataset.
 
-## Fase 1: Deriva Espacial nos Embeddings
+## Phase 1: Embedding Spatial Drift
 
-**Pergunta**: fragmentos com maior complexidade sintático-literária produzem
-uma similaridade de cosseno menor entre `texto_original` e
-`texto_simplificado` do que fragmentos sintaticamente diretos — mesmo quando
-ambos os membros do par são, por construção, semanticamente equivalentes?
+**Question**: do fragments with higher literary syntactic complexity
+produce a lower cosine similarity between `texto_original` and
+`texto_simplificado` than syntactically direct fragments — even though both
+members of the pair are, by construction, semantically equivalent?
 
-**Desenho**:
-1. Gerar embeddings de `texto_original` e `texto_simplificado` para cada par,
-   usando múltiplos modelos de embedding (BGE-M3, LaBSE, EmbeddingGemma), de
-   modo que a conclusão não dependa de uma arquitetura específica.
-2. Calcular a similaridade de cosseno entre os dois vetores de cada par, por
-   modelo.
-3. Agregar a similaridade por `fenomeno_linguistico` e por autor, e comparar
-   as distribuições entre fenômenos e entre modelos.
+**Design**:
+1. Generate embeddings of `texto_original` and `texto_simplificado` for
+   each pair, using multiple embedding models (BGE-M3, LaBSE,
+   EmbeddingGemma), so the conclusion doesn't depend on a single
+   architecture.
+2. Compute the cosine similarity between the two vectors of each pair, per
+   model.
+3. Aggregate similarity by `fenomeno_linguistico` and by author, and
+   compare the distributions across phenomena and across models.
 
-**Leitura esperada sob a hipótese**: pares cujo original é marcado com
-hipérbato acentuado, neologismo denso ou metáfora opaca devem apresentar
-similaridade de cosseno sistematicamente menor do que pares cujo original já
-é sintaticamente próximo da "tradução" (efeito de "deriva espacial" do
-fragmento complexo em relação ao seu conteúdo proposicional real, medido no
-espaço de embedding).
+**Expected reading under the hypothesis**: pairs whose original is marked
+with pronounced hyperbaton, dense neologism, or opaque metaphor should show
+systematically lower cosine similarity than pairs whose original is already
+syntactically close to the "translation" (a "spatial drift" effect of the
+complex fragment relative to its actual propositional content, as measured
+in embedding space).
 
-Ver stubs de implementação em `src/embeddings/generate.py` e
+See implementation stubs in `src/embeddings/generate.py` and
 `src/embeddings/compare.py`.
 
-## Fase 2: Cegueira Interpretativa
+## Phase 2: Interpretive Blindness
 
-**Pergunta**: LLMs cometem mais erros de interpretação/inferência lógica —
-alucinação, quebra de raciocínio, recusa — ao processar `texto_original` do
-que ao processar `texto_simplificado` do mesmo par, e essa diferença escala
-com a complexidade sintático-literária do fragmento?
+**Question**: do LLMs make more interpretation/logical-inference errors —
+hallucination, reasoning breakdown, refusal — when processing
+`texto_original` than when processing `texto_simplificado` of the same
+pair, and does that difference scale with the fragment's literary syntactic
+complexity?
 
-**Desenho**:
-1. Submeter `texto_original` e `texto_simplificado` de cada par,
-   separadamente, a múltiplos LLMs (Gemini 2.5 Flash, Qwen3 via Ollama
-   local, Llama 3.3 via Groq), com um prompt padronizado de
-   interpretação/inferência lógica.
-2. Classificar cada resposta segundo uma taxonomia de falha (alucinação
-   factual, quebra de raciocínio, recusa/evasão, interpretação correta —
-   taxonomia a refinar, ver `docs/ANNOTATION_GUIDE.md` e o stub de
-   `src/llm_eval/classify_responses.py`).
-3. Comparar a taxa de falha entre `texto_original` e `texto_simplificado`
-   para o mesmo fragmento, por modelo e por `fenomeno_linguistico`.
+**Design**:
+1. Submit `texto_original` and `texto_simplificado` of each pair,
+   separately, to multiple LLMs (Gemini 2.5 Flash, Qwen3 via local Ollama,
+   Llama 3.3 via Groq), with a standardized interpretation/logical-inference
+   prompt.
+2. Classify each response according to a failure taxonomy (factual
+   hallucination, reasoning breakdown, refusal/evasion, correct
+   interpretation — taxonomy to be refined, see `docs/ANNOTATION_GUIDE.md`
+   and the stub in `src/llm_eval/classify_responses.py`).
+3. Compare the failure rate between `texto_original` and
+   `texto_simplificado` for the same fragment, by model and by
+   `fenomeno_linguistico`.
 
-**Leitura esperada sob a hipótese**: a taxa de falha de interpretação é
-maior para `texto_original` do que para `texto_simplificado` do mesmo par, e
-essa diferença ("cegueira interpretativa") é mais pronunciada nos fenômenos
-linguísticos de maior complexidade sintática.
+**Expected reading under the hypothesis**: the interpretation failure rate
+is higher for `texto_original` than for `texto_simplificado` of the same
+pair, and this difference ("interpretive blindness") is more pronounced for
+linguistic phenomena of higher syntactic complexity.
 
-Ver stubs de implementação em `src/llm_eval/query_llms.py` e
+See implementation stubs in `src/llm_eval/query_llms.py` and
 `src/llm_eval/classify_responses.py`.
 
 ## Status
 
-Fase de construção do dataset. As Fases 1 e 2 dependem de um dataset
-validado em `data/processed/dataset.jsonl`; a lógica de chamada a
-embeddings/LLMs ainda não foi implementada (apenas stubs com TODOs).
+Dataset construction phase. Phases 1 and 2 depend on a validated dataset at
+`data/processed/dataset.jsonl`; the embedding/LLM-calling logic hasn't been
+implemented yet (stubs with TODOs only).

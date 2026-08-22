@@ -1,13 +1,17 @@
-"""Schema canônico do dataset do Laboratório de Estresse Semântico.
+"""Canonical dataset schema for the Semantic Stress Lab.
 
-Cada registro do dataset representa um par (fragmento original / fragmento
-"traduzido intralingualmente") anotado por um humano, junto com metadados
-bibliográficos e de controle de qualidade da anotação.
+Each dataset record represents a (original fragment / "intralingually
+translated" fragment) pair annotated by a human, along with bibliographic
+metadata and annotation quality-control fields.
 
-Este módulo é a fonte única de verdade sobre o formato dos dados: tanto o
-conversor CSV -> JSONL (`csv_to_jsonl.py`) quanto qualquer código downstream
-(geração de embeddings, avaliação de LLMs) devem validar contra o modelo
-`FragmentoDataset` definido aqui, em vez de reimplementar as regras.
+This module is the single source of truth for the data format: both the
+CSV -> JSONL converter (`csv_to_jsonl.py`) and any downstream code
+(embedding generation, LLM evaluation) should validate against the
+`FragmentoDataset` model defined here, instead of reimplementing the rules.
+
+Field names and enum values are kept in Portuguese, matching the
+Portuguese-language literary corpus and annotation workflow the dataset
+describes.
 """
 
 from __future__ import annotations
@@ -19,13 +23,13 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class FenomenoLinguistico(str, Enum):
-    """Fenômeno sintático-literário predominante no fragmento original.
+    """Dominant literary syntactic phenomenon in the original fragment.
 
-    Se um fragmento exibir mais de um fenômeno de forma proeminente, o
-    anotador deve escolher o dominante para efeitos de agrupamento estatístico
-    e registrar os demais em `notas`. (Revisar esta decisão de design ao
-    longo da fase de anotação piloto — pode fazer sentido migrar para uma
-    lista de fenômenos por fragmento.)
+    If a fragment prominently exhibits more than one phenomenon, the
+    annotator should pick the dominant one for statistical grouping
+    purposes and record the others in `notas`. (Revisit this design
+    decision during the pilot annotation phase — it may make sense to
+    move to a list of phenomena per fragment.)
     """
 
     HIPERBATO = "hiperbato"
@@ -35,52 +39,53 @@ class FenomenoLinguistico(str, Enum):
 
 
 class FragmentoDataset(BaseModel):
-    """Um par (original, tradução intralingual) com metadados de anotação.
+    """An (original, intralingual translation) pair with annotation metadata.
 
-    `texto_original` é o fragmento extraído verbatim da obra em domínio
-    público. `texto_simplificado` é a reescrita produzida seguindo o
-    protocolo de tradução intralingual descrito em
-    `docs/METHODOLOGY.md` (equivalência semântica + entailment
-    bidirecional), cujo objetivo é remover o fenômeno sintático-literário
-    marcado em `fenomeno_linguistico` sem alterar o conteúdo proposicional.
+    `texto_original` is the fragment extracted verbatim from the
+    public-domain work. `texto_simplificado` is the rewrite produced
+    following the intralingual translation protocol described in
+    `docs/METHODOLOGY.md` (semantic equivalence + bidirectional
+    entailment), whose goal is to remove the literary syntactic phenomenon
+    marked in `fenomeno_linguistico` without changing the propositional
+    content.
     """
 
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
-    id: str = Field(..., min_length=1, description="Identificador único do par, ex. 'camoes-lusiadas-001'.")
-    autor: str = Field(..., min_length=1, description="Nome do autor, ex. 'Luís de Camões'.")
-    obra: str = Field(..., min_length=1, description="Obra de origem, ex. 'Os Lusíadas'.")
+    id: str = Field(..., min_length=1, description="Unique identifier for the pair, e.g. 'camoes-lusiadas-001'.")
+    autor: str = Field(..., min_length=1, description="Author name, e.g. 'Luís de Camões'.")
+    obra: str = Field(..., min_length=1, description="Source work, e.g. 'Os Lusíadas'.")
     ano_publicacao: Optional[int] = Field(
         default=None,
         gt=0,
-        description="Ano de publicação da obra (ou de composição, se anterior à publicação).",
+        description="Publication year of the work (or composition year, if earlier than publication).",
     )
     fenomeno_linguistico: FenomenoLinguistico = Field(
-        ..., description="Fenômeno sintático-literário predominante sendo testado."
+        ..., description="Dominant literary syntactic phenomenon being tested."
     )
-    texto_original: str = Field(..., min_length=1, description="Fragmento original, verbatim.")
+    texto_original: str = Field(..., min_length=1, description="Original fragment, verbatim.")
     texto_simplificado: str = Field(
-        ..., min_length=1, description="Tradução intralingual (versão simplificada) do fragmento."
+        ..., min_length=1, description="Intralingual translation (simplified version) of the fragment."
     )
-    anotador_original: str = Field(..., min_length=1, description="Identificação de quem produziu a tradução intralingual.")
+    anotador_original: str = Field(..., min_length=1, description="Identifier of who produced the intralingual translation.")
     anotador_revisao: Optional[str] = Field(
-        default=None, description="Identificação de quem revisou o par (segunda opinião), se houver."
+        default=None, description="Identifier of who reviewed the pair (second opinion), if any."
     )
     nivel_confianca_equivalencia: int = Field(
         ...,
         ge=1,
         le=5,
         description=(
-            "Escala Likert (1-5) de confiança do(s) anotador(es) de que "
-            "texto_original e texto_simplificado são semanticamente "
-            "equivalentes (ver critérios em docs/ANNOTATION_GUIDE.md)."
+            "Likert scale (1-5) of the annotator(s)' confidence that "
+            "texto_original and texto_simplificado are semantically "
+            "equivalent (see criteria in docs/ANNOTATION_GUIDE.md)."
         ),
     )
-    notas: Optional[str] = Field(default=None, description="Observações livres do anotador ou revisor.")
+    notas: Optional[str] = Field(default=None, description="Free-form notes from the annotator or reviewer.")
 
     @field_validator("texto_original", "texto_simplificado")
     @classmethod
-    def _texto_nao_vazio_apos_strip(cls, v: str) -> str:
+    def _text_not_blank_after_strip(cls, v: str) -> str:
         if not v.strip():
-            raise ValueError("texto não pode ser vazio ou conter apenas espaços em branco")
+            raise ValueError("text must not be empty or contain only whitespace")
         return v

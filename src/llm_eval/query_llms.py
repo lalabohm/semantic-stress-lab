@@ -1,30 +1,30 @@
-"""Submete texto_original e texto_simplificado a múltiplos LLMs para interpretação.
+"""Submits texto_original and texto_simplificado to multiple LLMs for interpretation.
 
-TODO: este módulo ainda não está implementado — é um stub para revisão de
-estrutura antes de escrever a lógica de chamada às APIs.
+TODO: this module is not implemented yet — it's a stub for structure review
+before writing the API-calling logic.
 
-Responsabilidades previstas:
-    - Ler data/processed/dataset.jsonl.
-    - Para cada fragmento (original e simplificado, separadamente, sem
-      revelar ao modelo qual é qual nem que existe um par), enviar um
-      prompt padronizado de interpretação/inferência lógica para cada um
-      dos LLMs configurados:
+Planned responsibilities:
+    - Read data/processed/dataset.jsonl.
+    - For each fragment (original and simplified, separately, without
+      revealing to the model which is which or that a pair exists), send a
+      standardized interpretation/logical-inference prompt to each
+      configured LLM:
         * Gemini 2.5 Flash  (google-generativeai; GOOGLE_API_KEY)
         * Qwen3             (ollama, local; OLLAMA_HOST)
         * Llama 3.3         (groq; GROQ_API_KEY)
-    - Aplicar retry/backoff e rate limiting apropriados a cada provedor.
-    - Persistir as respostas cruas (prompt, modelo, resposta, timestamp,
-      parâmetros de geração) em results/, indexadas por `id` do fragmento
-      + modelo, para que `classify_responses.py` não precise re-consultar
-      os LLMs a cada execução.
-    - Carregar as chaves de API a partir de variáveis de ambiente (ver
-      .env.example), nunca hardcoded.
+    - Apply appropriate retry/backoff and rate limiting per provider.
+    - Persist raw responses (prompt, model, response, timestamp, generation
+      parameters) in results/, indexed by fragment `id` + model, so
+      `classify_responses.py` doesn't need to re-query the LLMs on every
+      run.
+    - Load API keys from environment variables (see .env.example), never
+      hardcoded.
 
-Ver também:
+See also:
     - src/llm_eval/classify_responses.py
-    - docs/METHODOLOGY.md, seção "Fase 2: Cegueira Interpretativa"
+    - docs/METHODOLOGY.md, "Phase 2: Interpretive Blindness" section
 """
 
 from __future__ import annotations
 
-# TODO: implementar. Ver docstring do módulo para o escopo previsto.
+# TODO: implement. See module docstring for the planned scope.

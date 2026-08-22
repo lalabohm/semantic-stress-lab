@@ -1,85 +1,88 @@
-# Guia de Anotação
+# Annotation Guide
 
-> Esqueleto inicial — critérios a refinar durante a rodada piloto de
-> anotação. Ver `docs/METHODOLOGY.md` para o protocolo de tradução
-> intralingual e a checagem de entailment bidirecional que este guia
-> operacionaliza.
+> Initial skeleton — criteria to be refined during the pilot annotation
+> round. See `docs/METHODOLOGY.md` for the intralingual translation
+> protocol and the bidirectional entailment check this guide
+> operationalizes.
 
-## O que o anotador está produzindo
+## What the annotator is producing
 
-Para cada fragmento original selecionado (`texto_original`), o anotador
-escreve uma **tradução intralingual** (`texto_simplificado`): uma reescrita
-em português contemporâneo que remove o `fenomeno_linguistico` marcado
-(hipérbato, neologismo, metáfora ou paradoxo) preservando o conteúdo
-proposicional do original — o que ele afirma, nega, pergunta ou implica.
+For each selected original fragment (`texto_original`), the annotator
+writes an **intralingual translation** (`texto_simplificado`): a rewrite in
+contemporary Portuguese that removes the marked `fenomeno_linguistico`
+(hyperbaton, neologism, metaphor, or paradox) while preserving the
+propositional content of the original — what it asserts, denies, asks, or
+implies.
 
-O objetivo **não** é produzir uma paráfrase elegante ou uma "modernização
-literária". É produzir o texto mais direto e sintaticamente neutro possível
-que ainda diz exatamente a mesma coisa que o original.
+The goal is **not** to produce an elegant paraphrase or a "literary
+modernization." It's to produce the most direct, syntactically neutral text
+that still says exactly the same thing as the original.
 
-## Critérios de uma boa tradução intralingual
+## Criteria for a good intralingual translation
 
-- [ ] **Equivalência proposicional bidirecional**: o original implica a
-      simplificação e a simplificação implica o original (nenhum conteúdo
-      foi acrescentado nem perdido). Ver "entailment bidirecional" em
+- [ ] **Bidirectional propositional equivalence**: the original entails the
+      simplification and the simplification entails the original (no
+      content added or lost). See "bidirectional entailment" in
       `docs/METHODOLOGY.md`.
-- [ ] **Remove especificamente o fenômeno marcado**:
-  - *Hipérbato*: ordem sintática direta (sujeito–verbo–objeto), sem
-    inversões que exijam reprocessamento para entender quem faz o quê a quem.
-  - *Neologismo*: substituído por palavra(s) de vocabulário corrente com o
-    mesmo sentido pretendido — sem inventar um neologismo novo para "traduzir"
-    o antigo.
-  - *Metáfora*: sentido literal explicitado; a simplificação não deve
-    introduzir uma metáfora diferente para substituir a original.
-  - *Paradoxo*: a tensão lógica aparente é resolvida/explicada em linguagem
-    direta, sem preservar a formulação contraditória de superfície.
-- [ ] **Não introduz complexidade nova**: a simplificação não deve trocar um
-      fenômeno complexo por outro (ex. resolver um hipérbato mas introduzir
-      um neologismo nas palavras escolhidas).
-- [ ] **Não neutraliza ambiguidade proposital que faz parte do conteúdo**:
-      se o original é genuinamente ambíguo entre duas leituras (e isso é
-      parte do que o texto comunica, não um efeito do fenômeno sintático em
-      si), a simplificação deve preservar essa ambiguidade, não resolvê-la
-      arbitrariamente para um dos lados.
-- [ ] **Registro neutro**: mudanças de registro (formal → coloquial, por
-      exemplo) são aceitáveis apenas na medida em que forem necessárias para
-      a simplificação sintática; não é objetivo do exercício modernizar o
-      tom.
+- [ ] **Specifically removes the marked phenomenon**:
+  - *Hyperbaton*: direct syntactic order (subject–verb–object), with no
+    inversions that require reprocessing to figure out who does what to
+    whom.
+  - *Neologism*: replaced with current-vocabulary word(s) carrying the same
+    intended sense — without inventing a new neologism to "translate" the
+    old one.
+  - *Metaphor*: literal sense made explicit; the simplification must not
+    introduce a different metaphor in place of the original.
+  - *Paradox*: the apparent logical tension is resolved/explained in direct
+    language, without preserving the contradictory surface formulation.
+- [ ] **Doesn't introduce new complexity**: the simplification shouldn't
+      trade one complex phenomenon for another (e.g. resolving a hyperbaton
+      but introducing a neologism in the chosen words).
+- [ ] **Doesn't neutralize deliberate ambiguity that is part of the
+      content**: if the original is genuinely ambiguous between two
+      readings (and that ambiguity is part of what the text communicates,
+      not an effect of the syntactic phenomenon itself), the simplification
+      should preserve that ambiguity, not arbitrarily resolve it toward one
+      side.
+- [ ] **Neutral register**: register shifts (formal → colloquial, for
+      example) are acceptable only to the extent required by the syntactic
+      simplification; modernizing tone is not a goal of the exercise.
 
-## Sinais de que um par é problemático (não deve entrar sem revisão)
+## Signs that a pair is problematic (shouldn't go in without review)
 
-- A simplificação acrescenta uma explicação/interpretação que não está no
-  original (ex. explicitar uma causa, motivação ou avaliação que o original
-  deixa implícita ou em aberto).
-- A simplificação é mais curta/longa a ponto de sugerir que informação foi
-  perdida ou adicionada, e não apenas reformulada.
-- O anotador não consegue articular, em uma frase, por que as duas versões
-  "dizem a mesma coisa" — se a equivalência não é defensável em prosa
-  simples, provavelmente não é uma boa tradução intralingual.
-- `nivel_confianca_equivalencia` abaixo de 4 sem uma nota explicando a
-  reserva específica em `notas`.
+- The simplification adds an explanation/interpretation that isn't in the
+  original (e.g. spelling out a cause, motivation, or judgment that the
+  original leaves implicit or open).
+- The simplification is short/long enough to suggest information was lost
+  or added, not just reworded.
+- The annotator can't articulate, in one sentence, why the two versions
+  "say the same thing" — if the equivalence isn't defensible in plain
+  prose, it's probably not a good intralingual translation.
+- `nivel_confianca_equivalencia` below 4 without a note explaining the
+  specific reservation in `notas`.
 
-## Processo de revisão
+## Review process
 
-1. `anotador_original` produz o par e preenche `nivel_confianca_equivalencia`
-   com sua própria avaliação honesta (não infle a confiança).
-2. Um segundo anotador (`anotador_revisao`) avalia o par de forma
-   independente contra os critérios acima, sem ver a nota de confiança do
-   primeiro anotador antes de formar sua própria opinião.
-3. Divergências relevantes (ex. diferença de 2+ pontos na confiança
-   percebida, ou discordância sobre alguma das direções do entailment) são
-   discutidas e resolvidas antes do par entrar em `data/processed/`; a
-   resolução (ou a divergência remanescente) é registrada em `notas`.
+1. `anotador_original` produces the pair and fills in
+   `nivel_confianca_equivalencia` with their own honest assessment (don't
+   inflate confidence).
+2. A second annotator (`anotador_revisao`) evaluates the pair
+   independently against the criteria above, without seeing the first
+   annotator's confidence score before forming their own opinion.
+3. Meaningful disagreements (e.g. a 2+ point difference in perceived
+   confidence, or disagreement about either direction of entailment) are
+   discussed and resolved before the pair enters `data/processed/`; the
+   resolution (or the remaining disagreement) is recorded in `notas`.
 
-## TODO (a refinar na rodada piloto)
+## TODO (to refine during the pilot round)
 
-- [ ] Calibrar exemplos concretos por autor (Camões, Vieira, Gregório de
-      Matos, Mário de Andrade, Pessoa/heterônimos) — o que conta como
-      hipérbato "leve" vs. "acentuado" varia muito entre eles.
-- [ ] Definir um limiar mínimo de `nivel_confianca_equivalencia` para um par
-      ser incluído no dataset "congelado" usado nos experimentos (ver TODO
-      em `src/dataset/build_dataset.py`).
-- [ ] Decidir se `fenomeno_linguistico` deve permanecer categórico único ou
-      migrar para múltiplos fenômenos por fragmento.
-- [ ] Registrar exemplos anotados (bons e problemáticos) neste documento
-      conforme a rodada piloto avançar.
+- [ ] Calibrate concrete examples per author (Camões, Vieira, Gregório de
+      Matos, Mário de Andrade, Pessoa/heteronyms) — what counts as "mild"
+      vs. "pronounced" hyperbaton varies a lot between them.
+- [ ] Define a minimum `nivel_confianca_equivalencia` threshold for a pair
+      to be included in the "frozen" dataset used in the experiments (see
+      TODO in `src/dataset/build_dataset.py`).
+- [ ] Decide whether `fenomeno_linguistico` should stay a single category
+      or move to multiple phenomena per fragment.
+- [ ] Log annotated examples (good and problematic) in this document as the
+      pilot round progresses.

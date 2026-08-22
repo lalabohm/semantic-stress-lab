@@ -1,8 +1,8 @@
-"""Testes de sanidade para o schema do dataset (src/dataset/schema.py).
+"""Sanity tests for the dataset schema (src/dataset/schema.py).
 
-Cobrem apenas a validação de estrutura/tipos do FragmentoDataset. Testes de
-conteúdo linguístico (ex. qualidade da tradução intralingual) pertencem à
-revisão humana descrita em docs/ANNOTATION_GUIDE.md, não a este arquivo.
+These cover only the structural/type validation of FragmentoDataset.
+Linguistic content tests (e.g. intralingual translation quality) belong to
+the human review described in docs/ANNOTATION_GUIDE.md, not to this file.
 """
 
 from __future__ import annotations
@@ -45,13 +45,13 @@ def test_invalid_fenomeno_raises():
         FragmentoDataset(**invalid)
 
 
-def test_confianca_fora_da_escala_raises():
+def test_confianca_out_of_scale_raises():
     invalid = dict(VALID_RECORD, nivel_confianca_equivalencia=6)
     with pytest.raises(ValidationError):
         FragmentoDataset(**invalid)
 
 
-def test_texto_em_branco_raises():
+def test_blank_text_raises():
     invalid = dict(VALID_RECORD, texto_simplificado="   ")
     with pytest.raises(ValidationError):
         FragmentoDataset(**invalid)

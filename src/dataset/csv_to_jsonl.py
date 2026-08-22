@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-"""Converte uma planilha de anotação (CSV) para o dataset final em .jsonl.
+"""Converts an annotation spreadsheet (CSV) into the final .jsonl dataset.
 
-Uso:
+Usage:
     python -m src.dataset.csv_to_jsonl \\
         --input data/annotation/lote_01.csv \\
         --output data/processed/dataset.jsonl
 
-O CSV de entrada deve ter uma coluna por campo do schema
+The input CSV must have one column per schema field
 (`src/dataset/schema.py::FragmentoDataset`): id, autor, obra,
 ano_publicacao, fenomeno_linguistico, texto_original, texto_simplificado,
 anotador_original, anotador_revisao, nivel_confianca_equivalencia, notas.
 
-Colunas opcionais (ano_publicacao, anotador_revisao, notas) podem ficar em
-branco nas linhas do CSV; células vazias são tratadas como `None`.
+Optional columns (ano_publicacao, anotador_revisao, notas) may be left
+blank in CSV rows; empty cells are treated as `None`.
 
-Cada linha é validada contra `FragmentoDataset` antes de ser escrita. Linhas
-inválidas são reportadas no stderr com o número da linha e o erro de
-validação, e por padrão não interrompem a conversão das linhas restantes
-(use --strict para abortar no primeiro erro).
+Each row is validated against `FragmentoDataset` before being written.
+Invalid rows are reported on stderr with the line number and the
+validation error, and by default don't stop the conversion of the
+remaining rows (use --strict to abort on the first error).
 """
 
 from __future__ import annotations
@@ -33,12 +33,12 @@ from pydantic import ValidationError
 
 from src.dataset.schema import FragmentoDataset
 
-# Colunas que podem ficar vazias no CSV (mapeadas para None antes da validação).
+# Columns that may be left blank in the CSV (mapped to None before validation).
 _OPTIONAL_COLUMNS = {"ano_publicacao", "anotador_revisao", "notas"}
 
 
 def _row_to_record(row: pd.Series) -> dict[str, Any]:
-    """Converte uma linha do CSV (pandas Series) em um dict pronto para validação."""
+    """Converts a CSV row (pandas Series) into a dict ready for validation."""
     record = row.to_dict()
     for key in _OPTIONAL_COLUMNS:
         value = record.get(key)
@@ -54,16 +54,16 @@ def _row_to_record(row: pd.Series) -> dict[str, Any]:
 
 
 def convert(input_path: Path, output_path: Path, strict: bool = False) -> tuple[int, int]:
-    """Lê `input_path`, valida cada linha e escreve os registros válidos em `output_path`.
+    """Reads `input_path`, validates each row, and writes valid records to `output_path`.
 
-    Retorna (n_validos, n_invalidos).
+    Returns (n_valid, n_invalid).
     """
     df = pd.read_csv(input_path, dtype=str)
 
     missing_columns = set(FragmentoDataset.model_fields) - set(df.columns)
     if missing_columns:
         raise ValueError(
-            f"CSV de entrada não contém as colunas obrigatórias: {sorted(missing_columns)}"
+            f"input CSV is missing required columns: {sorted(missing_columns)}"
         )
 
     valid_records: list[FragmentoDataset] = []
@@ -74,7 +74,7 @@ def convert(input_path: Path, output_path: Path, strict: bool = False) -> tuple[
         try:
             valid_records.append(FragmentoDataset(**raw))
         except ValidationError as exc:
-            message = f"linha {line_number} (id={raw.get('id')!r}): {exc}"
+            message = f"line {line_number} (id={raw.get('id')!r}): {exc}"
             if strict:
                 raise ValueError(message) from exc
             errors.append(message)
@@ -85,26 +85,26 @@ def convert(input_path: Path, output_path: Path, strict: bool = False) -> tuple[
             writer.write(record.model_dump(mode="json"))
 
     for message in errors:
-        print(f"[AVISO] registro descartado — {message}", file=sys.stderr)
+        print(f"[WARNING] record discarded — {message}", file=sys.stderr)
 
     return len(valid_records), len(errors)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--input", type=Path, required=True, help="CSV de anotação de entrada.")
-    parser.add_argument("--output", type=Path, required=True, help="Caminho do .jsonl de saída.")
+    parser.add_argument("--input", type=Path, required=True, help="Input annotation CSV.")
+    parser.add_argument("--output", type=Path, required=True, help="Output .jsonl path.")
     parser.add_argument(
         "--strict",
         action="store_true",
-        help="Aborta na primeira linha inválida em vez de descartá-la e seguir.",
+        help="Abort on the first invalid row instead of discarding it and continuing.",
     )
     args = parser.parse_args()
 
     n_valid, n_invalid = convert(args.input, args.output, strict=args.strict)
-    print(f"OK: {n_valid} registro(s) válido(s) escrito(s) em {args.output}")
+    print(f"OK: {n_valid} valid record(s) written to {args.output}")
     if n_invalid:
-        print(f"AVISO: {n_invalid} registro(s) descartado(s) por falha de validação", file=sys.stderr)
+        print(f"WARNING: {n_invalid} record(s) discarded due to validation failure", file=sys.stderr)
         sys.exit(1)
 
 
