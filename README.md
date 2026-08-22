@@ -1,54 +1,56 @@
-# Laboratório de Estresse Semântico
+# Semantic Stress Lab
 
-Pesquisa adversarial sobre como a complexidade sintático-literária —
-hipérbato, neologismo, metáfora, paradoxo — degrada a fidelidade de
-embeddings e induz alucinação/quebra de raciocínio em LLMs durante tarefas
-de interpretação (RAG), usando pares de fragmentos literários em português
-em domínio público (Camões, Padre Antônio Vieira, Gregório de Matos, Mário
-de Andrade, Fernando Pessoa e heterônimos) contra sua "tradução
-intralingual" (versão simplificada, semanticamente equivalente).
+Adversarial research on how literary syntactic complexity — hyperbaton,
+neologism, metaphor, paradox — degrades embedding fidelity and induces
+hallucination / reasoning breakdown in LLMs during interpretation tasks
+(RAG). This project tests **Portuguese-language texts specifically**: the
+corpus is built from public-domain Brazilian and Portuguese literature
+(Camões, Padre Antônio Vieira, Gregório de Matos, Mário de Andrade,
+Fernando Pessoa and his heteronyms), pairing each original fragment with an
+"intralingual translation" — a simplified, semantically equivalent
+rewrite in contemporary Portuguese.
 
-O experimento tem duas fases:
+The experiment runs in two phases:
 
-- **Fase 1 — Deriva Espacial nos Embeddings**: compara a similaridade de
-  cosseno entre original e simplificado usando múltiplos modelos de
-  embedding (BGE-M3, LaBSE, EmbeddingGemma), para não depender de uma única
-  arquitetura.
-- **Fase 2 — Cegueira Interpretativa**: submete original e simplificado a
-  múltiplos LLMs (Gemini 2.5 Flash, Qwen3 via Ollama local, Llama 3.3 via
-  Groq) e classifica as respostas para detectar alucinação ou quebra de
-  raciocínio induzida pela complexidade sintática.
+- **Phase 1 — Embedding Spatial Drift**: compares the cosine similarity
+  between original and simplified fragments using multiple embedding
+  models (BGE-M3, LaBSE, EmbeddingGemma), so results don't depend on a
+  single architecture.
+- **Phase 2 — Interpretive Blindness**: submits original and simplified
+  fragments to multiple LLMs (Gemini 2.5 Flash, Qwen3 via local Ollama,
+  Llama 3.3 via Groq) and classifies the responses to detect hallucination
+  or reasoning breakdown induced by syntactic complexity.
 
-Metodologia completa, incluindo o protocolo de tradução intralingual e a
-checagem de entailment bidirecional, em [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
-Critérios de anotação em [`docs/ANNOTATION_GUIDE.md`](docs/ANNOTATION_GUIDE.md).
+Full methodology, including the intralingual translation protocol and the
+bidirectional entailment check, in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
+Annotation criteria in [`docs/ANNOTATION_GUIDE.md`](docs/ANNOTATION_GUIDE.md).
 
-## Status atual
+## Current status
 
-🚧 Fase de construção do dataset. O schema (`src/dataset/schema.py`) e o
-conversor CSV → JSONL (`src/dataset/csv_to_jsonl.py`) estão implementados e
-testados. A lógica de geração de embeddings e de chamada aos LLMs
-(`src/embeddings/`, `src/llm_eval/`) ainda são stubs — Fases 1 e 2 ainda não
-foram executadas.
+🚧 Dataset construction phase. The schema (`src/dataset/schema.py`) and the
+CSV → JSONL converter (`src/dataset/csv_to_jsonl.py`) are implemented and
+tested. Embedding generation and LLM-calling logic
+(`src/embeddings/`, `src/llm_eval/`) are still stubs — Phases 1 and 2
+haven't been run yet.
 
-## Estrutura de pastas
+## Project structure
 
 ```
 data/
-  raw/            textos originais extraídos, organizados por autor
-  processed/      dataset final consolidado, em .jsonl
-  annotation/     planilhas/CSVs de trabalho para revisão humana
+  raw/            extracted original texts, organized by author
+  processed/      final consolidated dataset, in .jsonl
+  annotation/     working spreadsheets/CSVs for human review
 src/
-  dataset/        construção e validação do dataset (schema, CSV -> JSONL)
-  embeddings/     geração e comparação de embeddings (Fase 1) — stub
-  llm_eval/       chamada aos LLMs e classificação de respostas (Fase 2) — stub
-notebooks/        análise exploratória
+  dataset/        dataset construction and validation (schema, CSV -> JSONL)
+  embeddings/     embedding generation and comparison (Phase 1) — stub
+  llm_eval/       LLM calls and response classification (Phase 2) — stub
+notebooks/        exploratory analysis
 docs/             METHODOLOGY.md, ANNOTATION_GUIDE.md
-results/          outputs de experimentos, gráficos, tabelas
-tests/            testes automatizados
+results/          experiment outputs, plots, tables
+tests/            automated tests
 ```
 
-## Setup do ambiente
+## Environment setup
 
 ```bash
 python3 -m venv .venv
@@ -56,20 +58,20 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Configure as chaves de API necessárias para a Fase 2:
+Configure the API keys needed for Phase 2:
 
 ```bash
 cp .env.example .env
-# edite .env com GOOGLE_API_KEY e GROQ_API_KEY
+# edit .env with GOOGLE_API_KEY and GROQ_API_KEY
 ```
 
-Qwen3 roda localmente via [Ollama](https://ollama.com/) — não requer chave,
-mas requer o serviço rodando (`ollama serve`) e o modelo baixado
+Qwen3 runs locally via [Ollama](https://ollama.com/) — no key required, but
+the service must be running (`ollama serve`) and the model pulled
 (`ollama pull qwen3`).
 
-## Como rodar
+## How to run
 
-**Construir o dataset** a partir de uma planilha de anotação:
+**Build the dataset** from an annotation spreadsheet:
 
 ```bash
 python -m src.dataset.csv_to_jsonl \
@@ -77,16 +79,16 @@ python -m src.dataset.csv_to_jsonl \
   --output data/processed/dataset.jsonl
 ```
 
-Veja `data/annotation/exemplo.csv` para o formato de colunas esperado (um
-por campo de `FragmentoDataset` em `src/dataset/schema.py`).
+See `data/annotation/exemplo.csv` for the expected column format (one per
+field of `FragmentoDataset` in `src/dataset/schema.py`).
 
-**Rodar os testes**:
+**Run the tests**:
 
 ```bash
 pytest
 ```
 
-**Gerar embeddings** (Fase 1) e **rodar avaliação de LLMs** (Fase 2): ainda
-não implementado — ver TODOs em `src/embeddings/generate.py`,
-`src/embeddings/compare.py`, `src/llm_eval/query_llms.py` e
+**Generate embeddings** (Phase 1) and **run LLM evaluation** (Phase 2): not
+yet implemented — see the TODOs in `src/embeddings/generate.py`,
+`src/embeddings/compare.py`, `src/llm_eval/query_llms.py`, and
 `src/llm_eval/classify_responses.py`.
