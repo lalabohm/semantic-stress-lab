@@ -1,0 +1,49 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- Environment variables / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# --- Testing / coverage ---
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Data ---
+# Raw literary texts may come from sources with restrictive redistribution
+# terms even when in the public domain in some jurisdictions (e.g. critical
+# editions, annotated anthologies). If that turns out to be the case here,
+# uncomment the lines below to keep data/raw/ local-only and instead track
+# a small manifest (source, edition, license) alongside the code.
+# data/raw/**/*.txt
+# data/raw/**/*.pdf
+!data/raw/**/.gitkeep
+
+# Large generated experiment outputs (keep small summary tables/figures
+# you actually want versioned; ignore bulky raw dumps).
+results/*.jsonl
+results/*.parquet
+!results/.gitkeep
