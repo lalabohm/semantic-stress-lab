@@ -34,15 +34,64 @@ pairs) built, validated, and converted to
 `src/dataset/csv_to_jsonl.py`.
 
 ✅ **Phase 1** implemented in `src/embeddings/` and run on the pilot
-dataset. Results in
-[`results/phase1_embeddings/cosine_similarity_by_model.csv`](results/phase1_embeddings/cosine_similarity_by_model.csv).
-BGE-M3 and LaBSE similarities are complete for all 12 pairs;
-EmbeddingGemma is gated on Hugging Face and pending authentication
-(`huggingface-cli login` after accepting the license at
-[google/embeddinggemma-300m](https://huggingface.co/google/embeddinggemma-300m)).
+dataset with all three embedding models (BGE-M3, LaBSE, EmbeddingGemma),
+complete for all 12 pairs, no missing values. Results in
+[`results/phase1_embeddings/cosine_similarity_by_model.csv`](results/phase1_embeddings/cosine_similarity_by_model.csv)
+— see [Phase 1 results](#phase-1-results-embedding-spatial-drift) below.
 
 🚧 **Phase 2** (LLM evaluation, `src/llm_eval/`) not started yet — still
 stubs.
+
+## Phase 1 results: embedding spatial drift
+
+Cosine similarity between `texto_original` and `texto_simplificado`,
+averaged across the 12 pilot pairs, per model:
+
+| Model | Mean | Std dev |
+|---|---|---|
+| BGE-M3 | 0.6899 | 0.0938 |
+| LaBSE | 0.6521 | 0.1355 |
+| EmbeddingGemma | 0.6158 | 0.1405 |
+
+EmbeddingGemma has both the lowest mean and the highest variance of the
+three — it appears the most sensitive to the syntactic complexity of the
+original fragment in this pilot.
+
+By `fenomeno_linguistico` (sorted by mean similarity across the three
+models, lowest first — pilot dataset, n=1 pair per phenomenon):
+
+| Phenomenon | BGE-M3 | LaBSE | EmbeddingGemma |
+|---|---|---|---|
+| Paradoxo | 0.5067 | 0.3357 | 0.3357 |
+| Niilismo Ontológico / Não Ser | 0.5911 | 0.5519 | 0.5210 |
+| Niilismo Ontológico / Antinomia e Oximoro | 0.6373 | 0.5711 | 0.5200 |
+| Neologismo e Sarcasmo | 0.6379 | 0.5435 | 0.5805 |
+| Niilismo Fís / Estática do Nada | 0.6873 | 0.6594 | 0.5588 |
+| Niilismo Filosófico / Desconstrução Metafísica | 0.6806 | 0.7002 | 0.5401 |
+| Antítese | 0.7103 | 0.7440 | 0.5962 |
+| Eufemismo e Ironia | 0.7060 | 0.7021 | 0.7003 |
+| Metáfora Cósmica / Niilismo Físico | 0.7610 | 0.6957 | 0.6780 |
+| Paródia | 0.7118 | 0.7113 | 0.7464 |
+| Sugestão e Conotação | 0.7724 | 0.7423 | 0.7382 |
+| Zeugma | 0.8769 | 0.8681 | 0.8742 |
+
+**Cross-architecture agreement at the extremes** is the most notable
+finding so far: all three models — architecturally unrelated (BGE-M3,
+LaBSE's BERT-based dual encoder, and EmbeddingGemma's Gemma 3 backbone) —
+agree on both ends of the distribution. The lowest similarity is
+`vieira_002` (Padre Antônio Vieira, *Paradoxo*, "arte sem arte"), where
+LaBSE and EmbeddingGemma converge on the exact same value (0.3357); the
+highest is `assis_002` (Machado de Assis, *Zeugma*), where all three land
+in the 0.87–0.88 range. This convergence across independent architectures
+is evidence against a single-model artifact, in support of the project's
+core hypothesis: paradox — a phenomenon with genuine surface-level logical
+tension — appears to systematically stress embedding geometry, while
+zeugma — a purely syntactic ellipsis with no semantic ambiguity — does
+not.
+
+With n=1 pair per phenomenon, this pilot is descriptive, not statistically
+conclusive — expanding the annotated dataset is needed before drawing
+firm conclusions per phenomenon.
 
 ## Project structure
 
@@ -122,6 +171,7 @@ python -m src.embeddings.run_phase1
 
 ---
 
-![Study authors](assets/autores.jpeg)
-
-*Study authors*
+<p align="center">
+  <img src="assets/autores.jpeg" alt="Study authors" width="300"><br>
+  <em>Authors</em>
+</p>

@@ -2,8 +2,10 @@
 
 ## Core hypothesis
 
-Literary syntactic complexity — hyperbaton, neologism, metaphor, paradox —
-degrades the semantic fidelity of embeddings and induces reasoning failures
+Literary syntactic and rhetorical complexity — antithesis, euphemism,
+neologism, metaphor, paradox, zeugma, parody, and other phenomena
+catalogued during annotation — degrades the semantic fidelity of embeddings
+and induces reasoning failures
 in LLMs during interpretation tasks, even when the propositional content of
 the text is preserved. We test this by comparing each original literary
 fragment to an "intralingual translation" — a syntactically direct rewrite
@@ -30,6 +32,13 @@ order, replacing neologisms with a paraphrase in current vocabulary, making
 the literal sense behind a metaphor explicit, resolving the apparent
 tension of a paradox in direct language.
 
+`fenomeno_linguistico` is recorded as free text, not a fixed category
+list: the annotator names whatever phenomenon dominates the fragment. The
+pilot dataset already catalogs 12 distinct values with no closed list
+enforced — e.g. antithesis, euphemism, cosmic metaphor, neologism, paradox,
+parody, zeugma (see `data/processed/dataset_v0.jsonl` for the current set
+in use).
+
 **Equivalence check — bidirectional entailment**: before a pair enters the
 final dataset, the annotator (and, during review, a second annotator) must
 be able to assert both directions of logical implication:
@@ -42,8 +51,9 @@ be able to assert both directions of logical implication:
 When the annotator can't confidently support both directions, the pair is
 not a "good intralingual translation" — see detailed criteria in
 `docs/ANNOTATION_GUIDE.md`. The `nivel_confianca_equivalencia` field
-(1–5 scale) records confidence in this bidirectional check, and
-`anotador_revisao` records who provided the second opinion.
+(one of three categories: "alta", "média", "baixa") records confidence in
+this bidirectional check, and `anotador_revisao` records who provided the
+second opinion.
 
 This protocol is deliberately human-driven at this stage of the project. An
 automated entailment check (e.g. via an NLI model or an LLM judge) is a
@@ -75,8 +85,12 @@ syntactically close to the "translation" (a "spatial drift" effect of the
 complex fragment relative to its actual propositional content, as measured
 in embedding space).
 
-See implementation stubs in `src/embeddings/generate.py` and
-`src/embeddings/compare.py`.
+Implemented in `src/embeddings/models.py` (embedding model classes —
+BGE-M3, LaBSE, EmbeddingGemma — with a common `encode()` interface),
+`src/embeddings/similarity.py` (cosine similarity computation), and
+`src/embeddings/run_phase1.py` (the end-to-end pipeline: reads the
+dataset, generates embeddings and similarities per model, and writes
+`results/phase1_embeddings/cosine_similarity_by_model.csv`).
 
 ## Phase 2: Interpretive Blindness
 
@@ -109,6 +123,8 @@ See implementation stubs in `src/llm_eval/query_llms.py` and
 
 ## Status
 
-Dataset construction phase. Phases 1 and 2 depend on a validated dataset at
-`data/processed/dataset.jsonl`; the embedding/LLM-calling logic hasn't been
-implemented yet (stubs with TODOs only).
+Pilot dataset built and validated at `data/processed/dataset_v0.jsonl` (12
+annotated pairs). Phase 1 is implemented and has been run on the pilot
+dataset (`src/embeddings/`); results in
+`results/phase1_embeddings/cosine_similarity_by_model.csv`. Phase 2
+(`src/llm_eval/`) hasn't been implemented yet (stubs with TODOs only).
