@@ -1,0 +1,13 @@
+id,autor,fenomeno_linguistico,nivel_confianca_equivalencia,similaridade_bge_m3,similaridade_labse,similaridade_embeddinggemma
+vieira_001,Padre Antônio Vieira,Antítese,alta,0.7102965116500854,0.7439936995506287,
+assis_001,Machado de Assis,Eufemismo e Ironia,alta,0.7060421109199524,0.7021124362945557,
+anjos_001,Augusto dos Anjos,Metáfora Cósmica / Niilismo Físico,média,0.7610387206077576,0.6956637501716614,
+anjos_002,Augusto dos Anjos,Niilismo Fís / Estática do Nada,média,0.6872720122337341,0.6594241857528687,
+anjos_003,Augusto dos Anjos,Niilismo Ontológico / Antinomia e Oximoro,média,0.6373207569122314,0.5711359977722168,
+anjos_004,Augusto dos Anjos,Niilismo Ontológico / Não Ser,alta,0.5911124348640442,0.5518788695335388,
+andrade_001,Mário de Andrade,Neologismo e Sarcasmo,média,0.637877881526947,0.5435368418693542,
+anjos_005,Augusto dos Anjos,Niilismo Filosófico / Desconstrução Metafísica,alta,0.680633008480072,0.7002291083335876,
+vieira_002,Padre Antônio Vieira,Paradoxo,alta,0.5066618919372559,0.335737943649292,
+andrade_002,Mário de Andrade,Paródia,alta,0.7117738127708435,0.7112618088722229,
+azevedo_001,Aluísio Azevedo,Sugestão e Conotação,média,0.7724384665489197,0.7423198819160461,
+assis_002,Machado de Assis,Zeugma,média,0.876851499080658,0.868122935295105,

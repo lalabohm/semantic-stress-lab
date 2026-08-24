@@ -3,109 +3,103 @@
 
 Usage:
     python -m src.dataset.csv_to_jsonl \\
-        --input data/annotation/lote_01.csv \\
-        --output data/processed/dataset.jsonl
+        --input data/annotation/dataset_v0_draft.csv \\
+        --output data/processed/dataset_v0.jsonl
 
 The input CSV must have one column per schema field
-(`src/dataset/schema.py::FragmentoDataset`): id, autor, obra,
+(`src/dataset/schema.py::DatasetEntry`): id, autor, obra,
 ano_publicacao, fenomeno_linguistico, texto_original, texto_simplificado,
 anotador_original, anotador_revisao, nivel_confianca_equivalencia, notas.
 
-Optional columns (ano_publicacao, anotador_revisao, notas) may be left
-blank in CSV rows; empty cells are treated as `None`.
+`anotador_revisao` and `notas` may be left blank in CSV rows.
 
-Each row is validated against `FragmentoDataset` before being written.
-Invalid rows are reported on stderr with the line number and the
-validation error, and by default don't stop the conversion of the
-remaining rows (use --strict to abort on the first error).
+Every row is validated against `DatasetEntry` before anything is written.
+Validation errors are collected for ALL rows (not just the first one) and
+reported together; the .jsonl output file is only written if every row
+passes validation.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 from typing import Any
 
-import jsonlines
 import pandas as pd
 from pydantic import ValidationError
 
-from src.dataset.schema import FragmentoDataset
-
-# Columns that may be left blank in the CSV (mapped to None before validation).
-_OPTIONAL_COLUMNS = {"ano_publicacao", "anotador_revisao", "notas"}
+from src.dataset.schema import DatasetEntry
 
 
 def _row_to_record(row: pd.Series) -> dict[str, Any]:
     """Converts a CSV row (pandas Series) into a dict ready for validation."""
     record = row.to_dict()
-    for key in _OPTIONAL_COLUMNS:
-        value = record.get(key)
-        if pd.isna(value) or value == "":
-            record[key] = None
-    if record.get("ano_publicacao") is not None:
-        record["ano_publicacao"] = int(record["ano_publicacao"])
-    if record.get("nivel_confianca_equivalencia") is not None and not pd.isna(
-        record["nivel_confianca_equivalencia"]
-    ):
-        record["nivel_confianca_equivalencia"] = int(record["nivel_confianca_equivalencia"])
+
+    if record.get("anotador_revisao") == "":
+        record["anotador_revisao"] = None
+
+    if record.get("ano_publicacao") not in (None, ""):
+        record["ano_publicacao"] = int(float(record["ano_publicacao"]))
+
     return record
 
 
-def convert(input_path: Path, output_path: Path, strict: bool = False) -> tuple[int, int]:
-    """Reads `input_path`, validates each row, and writes valid records to `output_path`.
+def convert(input_path: Path, output_path: Path) -> list[DatasetEntry]:
+    """Reads `input_path`, validates every row, and writes `output_path`.
 
-    Returns (n_valid, n_invalid).
+    Raises ValueError (with all collected errors) if any row is invalid;
+    in that case, no output file is written. Returns the validated
+    records on success.
     """
-    df = pd.read_csv(input_path, dtype=str)
+    df = pd.read_csv(input_path, dtype=str, keep_default_na=False)
 
-    missing_columns = set(FragmentoDataset.model_fields) - set(df.columns)
+    missing_columns = set(DatasetEntry.model_fields) - set(df.columns)
     if missing_columns:
         raise ValueError(
             f"input CSV is missing required columns: {sorted(missing_columns)}"
         )
 
-    valid_records: list[FragmentoDataset] = []
+    records: list[DatasetEntry] = []
     errors: list[str] = []
 
     for line_number, (_, row) in enumerate(df.iterrows(), start=2):  # +2: header + 1-index
         raw = _row_to_record(row)
         try:
-            valid_records.append(FragmentoDataset(**raw))
+            records.append(DatasetEntry(**raw))
         except ValidationError as exc:
-            message = f"line {line_number} (id={raw.get('id')!r}): {exc}"
-            if strict:
-                raise ValueError(message) from exc
-            errors.append(message)
+            errors.append(f"linha {line_number} (id={raw.get('id')!r}):\n{exc}")
+
+    if errors:
+        details = "\n\n".join(errors)
+        raise ValueError(
+            f"validação falhou em {len(errors)} de {len(df)} linha(s) — "
+            f"nenhum arquivo .jsonl foi escrito:\n\n{details}"
+        )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with jsonlines.open(output_path, mode="w") as writer:
-        for record in valid_records:
-            writer.write(record.model_dump(mode="json"))
+    with output_path.open("w", encoding="utf-8") as f:
+        for record in records:
+            f.write(json.dumps(record.model_dump(mode="json"), ensure_ascii=False))
+            f.write("\n")
 
-    for message in errors:
-        print(f"[WARNING] record discarded — {message}", file=sys.stderr)
-
-    return len(valid_records), len(errors)
+    return records
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--input", type=Path, required=True, help="Input annotation CSV.")
     parser.add_argument("--output", type=Path, required=True, help="Output .jsonl path.")
-    parser.add_argument(
-        "--strict",
-        action="store_true",
-        help="Abort on the first invalid row instead of discarding it and continuing.",
-    )
     args = parser.parse_args()
 
-    n_valid, n_invalid = convert(args.input, args.output, strict=args.strict)
-    print(f"OK: {n_valid} valid record(s) written to {args.output}")
-    if n_invalid:
-        print(f"WARNING: {n_invalid} record(s) discarded due to validation failure", file=sys.stderr)
+    try:
+        records = convert(args.input, args.output)
+    except ValueError as exc:
+        print(f"ERRO: {exc}", file=sys.stderr)
         sys.exit(1)
+
+    print(f"OK: {len(records)} registro(s) validado(s) e gravado(s) em {args.output}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,8 @@
 # --- Embeddings ---
-sentence-transformers>=3.0.0
+# sentence-transformers>=5.0.0 and a recent transformers are required for
+# EmbeddingGemma (Gemma 3 backbone with bidirectional attention support).
+sentence-transformers>=5.0.0
+torch>=2.2.0
 
 # --- LLM APIs ---
 ollama>=0.3.0

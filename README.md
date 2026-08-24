@@ -1,14 +1,14 @@
 # Semantic Stress Lab
 
-Adversarial research on how literary syntactic complexity — hyperbaton,
-neologism, metaphor, paradox — degrades embedding fidelity and induces
-hallucination / reasoning breakdown in LLMs during interpretation tasks
-(RAG). This project tests **Portuguese-language texts specifically**: the
-corpus is built from public-domain Brazilian and Portuguese literature
-(Camões, Padre Antônio Vieira, Gregório de Matos, Mário de Andrade,
-Fernando Pessoa and his heteronyms), pairing each original fragment with an
-"intralingual translation" — a simplified, semantically equivalent
-rewrite in contemporary Portuguese.
+Adversarial research on how literary syntactic complexity — antithesis,
+euphemism, neologism, paradox, zeugma, parody, and related rhetorical
+phenomena — degrades embedding fidelity and induces hallucination /
+reasoning breakdown in LLMs during interpretation tasks (RAG). This
+project tests **Portuguese-language texts specifically**: the corpus is
+built from public-domain Brazilian literature (Padre Antônio Vieira,
+Machado de Assis, Augusto dos Anjos, Mário de Andrade, Aluísio Azevedo),
+pairing each original fragment with an "intralingual translation" — a
+simplified, semantically equivalent rewrite in contemporary Portuguese.
 
 The experiment runs in two phases:
 
@@ -27,22 +27,34 @@ Annotation criteria in [`docs/ANNOTATION_GUIDE.md`](docs/ANNOTATION_GUIDE.md).
 
 ## Current status
 
-🚧 Dataset construction phase. The schema (`src/dataset/schema.py`) and the
-CSV → JSONL converter (`src/dataset/csv_to_jsonl.py`) are implemented and
-tested. Embedding generation and LLM-calling logic
-(`src/embeddings/`, `src/llm_eval/`) are still stubs — Phases 1 and 2
-haven't been run yet.
+✅ Pilot dataset (`data/annotation/dataset_v0_draft.csv`, 12 annotated
+pairs) built, validated, and converted to
+`data/processed/dataset_v0.jsonl` via the schema in
+`src/dataset/schema.py` (`DatasetEntry`) and
+`src/dataset/csv_to_jsonl.py`.
+
+✅ **Phase 1** implemented in `src/embeddings/` and run on the pilot
+dataset. Results in
+[`results/phase1_embeddings/cosine_similarity_by_model.csv`](results/phase1_embeddings/cosine_similarity_by_model.csv).
+BGE-M3 and LaBSE similarities are complete for all 12 pairs;
+EmbeddingGemma is gated on Hugging Face and pending authentication
+(`huggingface-cli login` after accepting the license at
+[google/embeddinggemma-300m](https://huggingface.co/google/embeddinggemma-300m)).
+
+🚧 **Phase 2** (LLM evaluation, `src/llm_eval/`) not started yet — still
+stubs.
 
 ## Project structure
 
 ```
+assets/           static images (e.g. project photos)
 data/
   raw/            extracted original texts, organized by author
   processed/      final consolidated dataset, in .jsonl
   annotation/     working spreadsheets/CSVs for human review
 src/
   dataset/        dataset construction and validation (schema, CSV -> JSONL)
-  embeddings/     embedding generation and comparison (Phase 1) — stub
+  embeddings/     embedding models, cosine similarity, Phase 1 pipeline
   llm_eval/       LLM calls and response classification (Phase 2) — stub
 notebooks/        exploratory analysis
 docs/             METHODOLOGY.md, ANNOTATION_GUIDE.md
@@ -69,18 +81,25 @@ Qwen3 runs locally via [Ollama](https://ollama.com/) — no key required, but
 the service must be running (`ollama serve`) and the model pulled
 (`ollama pull qwen3`).
 
+EmbeddingGemma (used in Phase 1) is a gated model: accept the license at
+[google/embeddinggemma-300m](https://huggingface.co/google/embeddinggemma-300m)
+and authenticate with `huggingface-cli login` (or set `HF_TOKEN`) before
+running Phase 1 with all three embedding models.
+
 ## How to run
 
 **Build the dataset** from an annotation spreadsheet:
 
 ```bash
 python -m src.dataset.csv_to_jsonl \
-  --input data/annotation/lote_01.csv \
-  --output data/processed/dataset.jsonl
+  --input data/annotation/dataset_v0_draft.csv \
+  --output data/processed/dataset_v0.jsonl
 ```
 
 See `data/annotation/exemplo.csv` for the expected column format (one per
-field of `FragmentoDataset` in `src/dataset/schema.py`).
+field of `DatasetEntry` in `src/dataset/schema.py`). Validation errors are
+collected across all rows and reported together; the `.jsonl` file is only
+written if every row passes validation.
 
 **Run the tests**:
 
@@ -88,7 +107,21 @@ field of `FragmentoDataset` in `src/dataset/schema.py`).
 pytest
 ```
 
-**Generate embeddings** (Phase 1) and **run LLM evaluation** (Phase 2): not
-yet implemented — see the TODOs in `src/embeddings/generate.py`,
-`src/embeddings/compare.py`, `src/llm_eval/query_llms.py`, and
-`src/llm_eval/classify_responses.py`.
+**Generate embeddings and compute cosine similarity** (Phase 1):
+
+```bash
+# quick smoke test on a single pair first
+python -m src.embeddings.run_phase1 --ids vieira_001 --output /tmp/test.csv
+
+# full run
+python -m src.embeddings.run_phase1
+```
+
+**Run LLM evaluation** (Phase 2): not yet implemented — see the TODOs in
+`src/llm_eval/query_llms.py` and `src/llm_eval/classify_responses.py`.
+
+---
+
+![Study authors](assets/autores.jpeg)
+
+*Study authors*
