@@ -1,25 +1,25 @@
 # Semantic Stress Lab
 
-Adversarial research on how literary syntactic complexity — antithesis,
-euphemism, neologism, paradox, zeugma, parody, and related rhetorical
-phenomena — degrades embedding fidelity and induces hallucination /
-reasoning breakdown in LLMs during interpretation tasks (RAG). This
-project tests **Portuguese-language texts specifically**: the corpus is
-built from public-domain Brazilian literature (Padre Antônio Vieira,
-Machado de Assis, Augusto dos Anjos, Mário de Andrade, Aluísio Azevedo),
-pairing each original fragment with an "intralingual translation" — a
-simplified, semantically equivalent rewrite in contemporary Portuguese.
+Research on how literary syntactic and rhetorical complexity —
+antithesis, euphemism, neologism, paradox, zeugma, parody, and related
+phenomena — affects embedding similarity. This project measures how the
+syntactic-literary complexity of a fragment affects the embedding
+similarity (cosine similarity, a "spatial drift" effect) between an
+original text and its "intralingual translation" — a simplified,
+semantically equivalent rewrite in contemporary Portuguese — across
+multiple embedding models (BGE-M3, LaBSE, EmbeddingGemma), so the
+conclusion doesn't depend on a single architecture. This project tests
+**Portuguese-language texts specifically**: the corpus is built from
+public-domain Brazilian literature (Padre Antônio Vieira, Machado de
+Assis, Augusto dos Anjos, Mário de Andrade, Aluísio Azevedo).
 
-The experiment runs in two phases:
-
-- **Phase 1 — Embedding Spatial Drift**: compares the cosine similarity
-  between original and simplified fragments using multiple embedding
-  models (BGE-M3, LaBSE, EmbeddingGemma), so results don't depend on a
-  single architecture.
-- **Phase 2 — Interpretive Blindness**: submits original and simplified
-  fragments to multiple LLMs (Gemini 2.5 Flash, Qwen3 via local Ollama,
-  Llama 3.3 via Groq) and classifies the responses to detect hallucination
-  or reasoning breakdown induced by syntactic complexity.
+**Experiment**: for each (original, simplified) pair, generate embeddings
+of `texto_original` and `texto_simplificado` with each model, compute
+their cosine similarity, and compare that similarity across
+`fenomeno_linguistico` and across models — under the hypothesis, a
+fragment with more pronounced syntactic complexity should show lower
+similarity than a syntactically direct one, even though both members of
+the pair are, by construction, semantically equivalent.
 
 Full methodology, including the intralingual translation protocol and the
 bidirectional entailment check, in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
@@ -33,23 +33,19 @@ pairs) built, validated, and converted to
 `src/dataset/schema.py` (`DatasetEntry`) and
 `src/dataset/csv_to_jsonl.py`.
 
-✅ **Phase 1** implemented in `src/embeddings/` and run on the pilot
-dataset with all three embedding models (BGE-M3, LaBSE, EmbeddingGemma),
-complete for all 12 pairs, no missing values. Results in
+✅ The embedding pipeline is implemented in `src/embeddings/` and has been
+run on the pilot dataset with all three embedding models (BGE-M3, LaBSE,
+EmbeddingGemma), complete for all 12 pairs, no missing values. Results in
 [`results/phase1_embeddings/cosine_similarity_by_model.csv`](results/phase1_embeddings/cosine_similarity_by_model.csv)
-— see [Phase 1 results](#phase-1-results-embedding-spatial-drift) below.
+— see [results](#results-embedding-spatial-drift) below.
 
-🚧 **Phase 2** (LLM evaluation, `src/llm_eval/`) partially implemented and
-piloted with a single model (Qwen3, local Ollama): question generation
-(`questions.py`), the Ollama client (`ollama_client.py`), and the raw
-data-collection run (`run_phase2_pilot.py`) are done, with results in
-[`results/phase2_llm_eval/pilot_qwen3_raw.jsonl`](results/phase2_llm_eval/pilot_qwen3_raw.jsonl)
-— see [Phase 2 pilot results](#phase-2-pilot-results-interpretive-blindness-qwen3-only)
-below. Multi-model comparison (Gemini 2.5 Flash, Llama 3.3 via Groq) and
-systematic response classification (`classify_responses.py`) are not
-implemented yet.
+An earlier phase of this project piloted an LLM interpretation-evaluation
+experiment; it was dropped from active scope and archived — see
+[`archive/`](archive/) and the "Future work" section in
+[`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) for what it was and why it
+was discontinued.
 
-## Phase 1 results: embedding spatial drift
+## Results: embedding spatial drift
 
 Cosine similarity between `texto_original` and `texto_simplificado`,
 averaged across the 12 pilot pairs, per model:
@@ -100,82 +96,19 @@ With n=1 pair per phenomenon, this pilot is descriptive, not statistically
 conclusive — expanding the annotated dataset is needed before drawing
 firm conclusions per phenomenon.
 
-## Phase 2 pilot results: interpretive blindness (Qwen3 only)
-
-For each of the 12 pilot pairs, two hand-written questions were asked
-about *both* `texto_original` and `texto_simplificado` (same wording,
-same expected answer where applicable) — see
-[`data/processed/interpretation_questions.jsonl`](data/processed/interpretation_questions.jsonl):
-
-- a **closed true/false question** about a specific propositional fact,
-  objectively checkable and identical for both versions;
-- an **open question** asking for an interpretation of the fragment's
-  meaning/intention.
-
-All 48 raw responses (`qwen3:8b`, local Ollama) are in
-[`results/phase2_llm_eval/pilot_qwen3_raw.jsonl`](results/phase2_llm_eval/pilot_qwen3_raw.jsonl),
-unclassified — this pilot round was reviewed manually rather than scored
-automatically. Analysis below covers only the 24 closed-question
-responses; the 24 open-question responses have not been analyzed yet.
-
-| id | fenomeno_linguistico | acertou_original | acertou_simplificado |
-|---|---|---|---|
-| vieira_001 | Antítese | sim | sim |
-| assis_001 | Eufemismo e Ironia | **não** | sim |
-| anjos_001 | Metáfora Cósmica / Niilismo Físico | sim | sim |
-| anjos_002 | Niilismo Fís / Estática do Nada | sim | **não** |
-| anjos_003 | Niilismo Ontológico / Antinomia e Oximoro | sim | sim |
-| anjos_004 | Niilismo Ontológico / Não Ser | sim | sim |
-| andrade_001 | Neologismo e Sarcasmo | sim | sim |
-| anjos_005 | Niilismo Filosófico / Desconstrução Metafísica | sim | sim |
-| vieira_002 | Paradoxo | sim | sim |
-| andrade_002 | Paródia | sim | sim |
-| azevedo_001 | Sugestão e Conotação | sim | sim |
-| assis_002 | Zeugma | sim | sim |
-
-- Closed-question accuracy on `texto_original`: **11/12 (91.7%)**
-- Closed-question accuracy on `texto_simplificado`: **11/12 (91.7%)**
-- Difference: **0 points** — at this sample size (n=12), the aggregate
-  closed-question score shows no interpretive blindness effect.
-
-Only two pairs diverge between versions, in opposite directions:
-
-- `assis_001` (**Eufemismo e Ironia**) — wrong on original, correct on
-  simplified. This is the signal the hypothesis predicts: the model
-  answered "Falso" to the original's euphemism ("...foram estudar a
-  geologia dos campos santos"), missing that it means the friends died,
-  and only got it right once the simplified version made "morreram e
-  foram enterrados" explicit.
-- `anjos_002` (**Niilismo Fís / Estática do Nada**) — correct on
-  original, wrong on simplified, but for a likely question-design
-  artifact rather than a semantic one: the closed question is worded
-  around the exact phrase "milhões de mundos", which survives verbatim
-  in `texto_original` but was paraphrased to "planetas inteiros" (no
-  explicit quantity) in `texto_simplificado`. The model's "Falso" cites
-  that literal mismatch. Discounting this pair, the only clean signal in
-  this pilot favoring the hypothesis is `assis_001`.
-
-**Reading**: with true/false questions this direct, `qwen3:8b` performed
-near-ceiling on both versions in this pilot — too little room for errors
-to distinguish original from simplified at n=12. The open-question
-responses (not analyzed yet) are the more promising place to look for a
-qualitative interpretive-blindness effect, since open answers have much
-more room to be subtly wrong than a binary choice does.
-
 ## Project structure
 
 ```
+archive/          code and data from the discontinued LLM-interpretation
+                  pilot (out of active scope — see docs/METHODOLOGY.md)
 assets/           static images (e.g. project photos)
 data/
   raw/            extracted original texts, organized by author
-  processed/      final consolidated dataset (.jsonl) and Phase 2 questions
+  processed/      final consolidated dataset (.jsonl)
   annotation/     working spreadsheets/CSVs for human review
 src/
   dataset/        dataset construction and validation (schema, CSV -> JSONL)
-  embeddings/     embedding models, cosine similarity, Phase 1 pipeline
-  llm_eval/       Phase 2: questions.py, ollama_client.py, run_phase2_pilot.py
-                  (Qwen3/Ollama only so far); query_llms.py and
-                  classify_responses.py (multi-model, classification) — stubs
+  embeddings/     embedding models, cosine similarity, the main pipeline
 notebooks/        exploratory analysis
 docs/             METHODOLOGY.md, ANNOTATION_GUIDE.md
 results/          experiment outputs, plots, tables
@@ -190,23 +123,12 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Configure the API keys needed for Phase 2:
-
-```bash
-cp .env.example .env
-# edit .env with GOOGLE_API_KEY and GROQ_API_KEY
-```
-
-Qwen3 runs locally via [Ollama](https://ollama.com/) — no key required, but
-the service must be running (`ollama serve`) and the model pulled (e.g.
-`ollama pull qwen3:8b`; the tag actually pulled must match
-`DEFAULT_MODEL` in `src/llm_eval/ollama_client.py`, or be passed via
-`--model`).
-
-EmbeddingGemma (used in Phase 1) is a gated model: accept the license at
+EmbeddingGemma (one of the three embedding models) is a gated model:
+accept the license at
 [google/embeddinggemma-300m](https://huggingface.co/google/embeddinggemma-300m)
-and authenticate with `huggingface-cli login` (or set `HF_TOKEN`) before
-running Phase 1 with all three embedding models.
+and authenticate with `huggingface-cli login` (or set `HF_TOKEN`, see
+`.env.example`) before running the pipeline with all three embedding
+models.
 
 ## How to run
 
@@ -229,7 +151,7 @@ written if every row passes validation.
 pytest
 ```
 
-**Generate embeddings and compute cosine similarity** (Phase 1):
+**Generate embeddings and compute cosine similarity**:
 
 ```bash
 # quick smoke test on a single pair first
@@ -238,28 +160,6 @@ python -m src.embeddings.run_phase1 --ids vieira_001 --output /tmp/test.csv
 # full run
 python -m src.embeddings.run_phase1
 ```
-
-**Run LLM evaluation** (Phase 2, Qwen3/Ollama pilot only):
-
-```bash
-# 1. (Re)generate the interpretation questions from src/llm_eval/questions.py
-#    into data/processed/interpretation_questions.jsonl — review/edit that
-#    file by hand before running the pilot.
-python -m src.llm_eval.questions
-
-# 2. quick smoke test on a single pair first
-python -m src.llm_eval.run_phase2_pilot --ids vieira_001
-
-# 3. full pilot run (12 pairs x 4 tasks = 48 Ollama calls)
-python -m src.llm_eval.run_phase2_pilot
-```
-
-This only collects raw responses in
-`results/phase2_llm_eval/pilot_qwen3_raw.jsonl` — see
-[Phase 2 pilot results](#phase-2-pilot-results-interpretive-blindness-qwen3-only)
-above for the closed-question analysis. Multi-model comparison and
-systematic classification are not implemented yet — see the TODOs in
-`src/llm_eval/query_llms.py` and `src/llm_eval/classify_responses.py`.
 
 ---
 
