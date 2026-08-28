@@ -1,0 +1,26 @@
+id,fenomeno_linguistico,precisa_contexto_previo,motivo_contexto,sim_media,divergencia_entre_modelos
+vieira_001,Antítese,True,Conectivo 'Mas ainda' pressupõe fala anterior; dêixis não resolvível ('a seara aonde eu fui').,0.6834845542907715,0.14783024787902832
+assis_001,Eufemismo e Ironia,False,"Reflexão autocontida, sem referência externa necessária.",0.7028092940648397,0.005768775939941406
+anjos_001,Metáfora Cósmica / Niilismo Físico,False,"Imagem sensorial em primeira pessoa, autocontida.",0.7115607659022013,0.08305889368057251
+anjos_002,Niilismo Fís / Estática do Nada,True,Sujeito elíptico 'É a dor de...' remete a algo fora do trecho.,0.6351644198099772,0.12847495079040527
+anjos_003,Niilismo Ontológico / Antinomia e Oximoro,True,Apóstrofe sem indicar quem é o interlocutor dentro do trecho.,0.5761409203211466,0.11735475063323975
+anjos_004,Niilismo Ontológico / Não Ser,True,"Apóstrofe a 'tu, feto esquecido' -- interlocutor não identificado no trecho.",0.5546663800875345,0.07010459899902344
+andrade_001,Neologismo e Sarcasmo,True,Elisão explícita '(...)' sinalizando trecho suprimido.,0.5873056451479594,0.09434103965759277
+anjos_005,Niilismo Filosófico / Desconstrução Metafísica,False,"Apóstrofe a interlocutor genérico ('homem meditabundo'), não específico não identificado.",0.6403213739395142,0.16012710332870483
+vieira_002,Paradoxo,True,"'não é assim' é anafórico a algo dito antes, não recuperável no trecho.",0.392713983853658,0.17092394828796387
+andrade_002,Paródia,False,Frase de abertura do romance -- não pressupõe nada anterior.,0.7231332659721375,0.03510236740112305
+azevedo_001,Sugestão e Conotação,False,Personagem apresentado dentro da própria frase.,0.7509761850039164,0.03426826000213623
+assis_002,Zeugma,False,Personagem apresentado dentro da própria frase.,0.8730672001838684,0.008728563785552979
+camoes_001,Paradoxo,False,"Soneto completo, autocontido: lista de definições paradoxais + pergunta retórica final, sem referente externo.",0.8245502909024557,0.1196250319480896
+matos_001,Paradoxo,True,"Apóstrofe ('Sois Anjo...') a interlocutor referido só por epíteto, não identificado no verso isolado.",0.8893126646677653,0.07349061965942394
+assis_003,Ironia estrutural / Inversão conceitual,False,"Sujeito ('A loucura, objeto dos meus estudos') definido dentro do próprio trecho.",0.7115927537282308,0.15303897857666016
+camoes_002,Hipérbato,True,Dêixis não resolvível: 'Aquela...madrugada' remete a um evento específico não descrito no fragmento (é só o 1º verso).,0.6619665622711182,0.07648605108261108
+camoes_003,Antítese,True,Apóstrofe ('Repousa lá no Céu...') a um 'tu' não identificado no dístico isolado.,0.8650090098381042,0.05293339490890503
+matos_002,Antítese,True,Conectivo presuposicional 'Que' sem antecedente no trecho + apóstrofe a interlocutor ('estais') não identificado (Cristo não é nomeado aqui).,0.7328644196192423,0.051509857177734375
+matos_003,Zeugma,False,"Soneto completo, autocontido: argumento filosófico fechado sobre o mundo, sem 'tu' específico não identificado.",0.8884028196334839,0.068340003490448
+matos_004,Hipérbato,False,Mesmo texto de matos_003 (soneto completo) -- autocontido.,0.8884028196334839,0.068340003490448
+matos_005,Antítese,False,Mesmo texto de matos_003 (soneto completo) -- autocontido.,0.8884028196334839,0.068340003490448
+pessoa_001,Hipérbato,False,"Apóstrofe, mas o interlocutor É nomeado no próprio trecho ('a ti, Cristo') -- mesmo padrão de anjos_005 (identificado = autocontido).",0.8010847369829813,0.15139347314834595
+matos_006,Paradoxo,False,Mesmo texto de matos_003 (soneto completo) -- autocontido.,0.8884028196334839,0.068340003490448
+assis_004,Paradoxo e Metáfora,False,"Argumento narrativo completo, contextualiza seus próprios referentes (Moisés, Pentateuco) dentro do próprio trecho.",0.8892791072527567,0.03715455532073986
+pessoa_002,Hipérbato e Metáfora,False,"Imperativo a um 'tu' genérico (máxima moral), não um interlocutor específico não identificado -- mesmo padrão de anjos_005/pessoa_001.",0.7847539583841959,0.09693235158920288

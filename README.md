@@ -160,10 +160,3 @@ python -m src.embeddings.run_phase1 --ids vieira_001 --output /tmp/test.csv
 # full run
 python -m src.embeddings.run_phase1
 ```
-
----
-
-<p align="center">
-  <img src="assets/autores.jpeg" alt="Study authors" width="300"><br>
-  <em>Authors</em>
-</p>

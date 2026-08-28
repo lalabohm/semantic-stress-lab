@@ -1,0 +1,17 @@
+fenomeno_linguistico,n,similaridade_bge_m3_media,similaridade_labse_media,similaridade_embeddinggemma_media,similaridade_bge_m3_dp,similaridade_labse_dp,similaridade_embeddinggemma_dp,zscore_bge_m3_media,zscore_labse_media,zscore_embeddinggemma_media,zscore_bge_m3_dp,zscore_labse_dp,zscore_embeddinggemma_dp
+Niilismo Ontológico / Não Ser,1,0.5911,0.5519,0.521,,,,-14.1526,-18.5279,-15.6656,,,
+Niilismo Ontológico / Antinomia e Oximoro,1,0.6373,0.5711,0.52,,,,-12.3259,-17.6678,-15.704,,,
+Neologismo e Sarcasmo,1,0.6379,0.5435,0.5805,,,,-12.3039,-18.9005,-13.4728,,,
+Niilismo Filosófico / Desconstrução Metafísica,1,0.6806,0.7002,0.5401,,,,-10.6138,-11.9018,-14.9618,,,
+Niilismo Fís / Estática do Nada,1,0.6873,0.6594,0.5588,,,,-10.3513,-13.7243,-14.2728,,,
+Eufemismo e Ironia,1,0.706,0.7021,0.7003,,,,-9.6093,-11.8176,-9.0585,,,
+Paródia,1,0.7118,0.7113,0.7464,,,,-9.3827,-11.409,-7.3598,,,
+Hipérbato e Metáfora,1,0.7486,0.8456,0.7601,,,,-7.9256,-5.4102,-6.855,,,
+Metáfora Cósmica / Niilismo Físico,1,0.761,0.6957,0.678,,,,-7.4353,-12.1057,-9.8802,,,
+Hipérbato,3,0.7675,0.8365,0.7475,0.1136,0.1221,0.1179,-7.1813,-5.8153,-7.3181,4.4918,5.4543,4.344
+Sugestão e Conotação,1,0.7724,0.7423,0.7382,,,,-6.9846,-10.0217,-7.6618,,,
+Ironia estrutural / Inversão conceitual,1,0.7756,0.6226,0.7365,,,,-6.8583,-15.3693,-7.7216,,,
+Paradoxo,4,0.7888,0.7519,0.7056,0.1943,0.2784,0.2504,-6.3381,-9.5956,-8.8629,7.6805,12.4347,9.2296
+Antítese,4,0.8073,0.8182,0.7518,0.0839,0.104,0.1203,-5.607,-6.6305,-7.1599,3.3182,4.645,4.433
+Paradoxo e Metáfora,1,0.8652,0.9023,0.9004,,,,-3.3196,-2.8759,-1.6833,,,
+Zeugma,2,0.8844,0.8944,0.8633,0.0107,0.0372,0.0154,-2.5572,-3.2271,-3.0491,0.4242,1.6625,0.5683

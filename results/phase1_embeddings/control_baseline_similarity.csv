@@ -1,0 +1,6 @@
+id,autor,fenomeno_linguistico,nivel_confianca_equivalencia,similaridade_bge_m3,similaridade_labse,similaridade_embeddinggemma
+controle_001,Controle sintético,Controle (paráfrase trivial),alta,0.9686457514762878,0.985581636428833,0.9713258743286133
+controle_002,Controle sintético,Controle (paráfrase trivial),alta,0.9483820796012878,0.9679216742515564,0.9402205944061279
+controle_003,Controle sintético,Controle (paráfrase trivial),alta,0.9325512647628784,0.9286649227142334,0.9026415348052979
+controle_004,Controle sintético,Controle (paráfrase trivial),alta,0.9171983599662781,0.9711679220199585,0.9509606957435608
+controle_005,Controle sintético,Controle (paráfrase trivial),alta,0.9788589477539062,0.980130136013031,0.9651133418083191
