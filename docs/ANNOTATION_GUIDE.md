@@ -77,17 +77,12 @@ that still says exactly the same thing as the original.
 
 ## Review process
 
-1. `anotador_original` produces the pair and fills in
+1. The annotator produces the pair and fills in
    `nivel_confianca_equivalencia` with their own honest assessment (don't
    inflate confidence).
-2. A second annotator (`anotador_revisao`) evaluates the pair
-   independently against the criteria above, without seeing the first
-   annotator's confidence score before forming their own opinion.
-3. Meaningful disagreements (e.g. one annotator rates "alta" while the
-   other rates "baixa", or disagreement about either direction of
-   entailment) are discussed and resolved before the pair enters
-   `data/processed/`; the resolution (or the remaining disagreement) is
-   recorded in `notas`.
+2. Any reservation about the pair — a borderline entailment direction, an
+   edited/uncertain source text, a "média" or "baixa" confidence rating —
+   is recorded in `notas` before the pair enters `data/processed/`.
 
 ## TODO (to refine during the pilot round)
 

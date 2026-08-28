@@ -15,8 +15,6 @@ literary corpus and annotation workflow the dataset describes.
 
 from __future__ import annotations
 
-from typing import Optional
-
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 NIVEIS_CONFIANCA_VALIDOS = {"alta", "média", "baixa"}
@@ -44,10 +42,6 @@ class DatasetEntry(BaseModel):
     texto_original: str = Field(..., min_length=1, description="Original fragment, verbatim.")
     texto_simplificado: str = Field(
         ..., min_length=1, description="Intralingual translation (simplified version) of the fragment."
-    )
-    anotador_original: str = Field(..., min_length=1, description="Identifier of who produced the intralingual translation.")
-    anotador_revisao: Optional[str] = Field(
-        default=None, description="Identifier of who reviewed the pair (second opinion), if any."
     )
     nivel_confianca_equivalencia: str = Field(
         ...,

@@ -43,8 +43,8 @@ parody, zeugma (see `data/processed/dataset_v0.jsonl` for the current set
 in use).
 
 **Equivalence check — bidirectional entailment**: before a pair enters the
-final dataset, the annotator (and, during review, a second annotator) must
-be able to assert both directions of logical implication:
+final dataset, the annotator must be able to assert both directions of
+logical implication:
 
 1. `texto_original` entails `texto_simplificado` — nothing was added in the
    simplification that wasn't (even if implicitly) in the original.
@@ -55,8 +55,7 @@ When the annotator can't confidently support both directions, the pair is
 not a "good intralingual translation" — see detailed criteria in
 `docs/ANNOTATION_GUIDE.md`. The `nivel_confianca_equivalencia` field
 (one of three categories: "alta", "média", "baixa") records confidence in
-this bidirectional check, and `anotador_revisao` records who provided the
-second opinion.
+this bidirectional check.
 
 This protocol is deliberately human-driven at this stage of the project. An
 automated entailment check (e.g. via an NLI model or an LLM judge) is a

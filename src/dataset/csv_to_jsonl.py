@@ -9,9 +9,9 @@ Usage:
 The input CSV must have one column per schema field
 (`src/dataset/schema.py::DatasetEntry`): id, autor, obra,
 ano_publicacao, fenomeno_linguistico, texto_original, texto_simplificado,
-anotador_original, anotador_revisao, nivel_confianca_equivalencia, notas.
+nivel_confianca_equivalencia, notas.
 
-`anotador_revisao` and `notas` may be left blank in CSV rows.
+`notas` may be left blank in CSV rows.
 
 Every row is validated against `DatasetEntry` before anything is written.
 Validation errors are collected for ALL rows (not just the first one) and
@@ -36,9 +36,6 @@ from src.dataset.schema import DatasetEntry
 def _row_to_record(row: pd.Series) -> dict[str, Any]:
     """Converts a CSV row (pandas Series) into a dict ready for validation."""
     record = row.to_dict()
-
-    if record.get("anotador_revisao") == "":
-        record["anotador_revisao"] = None
 
     if record.get("ano_publicacao") not in (None, ""):
         record["ano_publicacao"] = int(float(record["ano_publicacao"]))
