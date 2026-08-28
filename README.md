@@ -27,17 +27,24 @@ Annotation criteria in [`docs/ANNOTATION_GUIDE.md`](docs/ANNOTATION_GUIDE.md).
 
 ## Current status
 
-✅ Pilot dataset (`data/annotation/dataset_v0_draft.csv`, 12 annotated
-pairs) built, validated, and converted to
-`data/processed/dataset_v0.jsonl` via the schema in
-`src/dataset/schema.py` (`DatasetEntry`) and
-`src/dataset/csv_to_jsonl.py`.
+✅ Dataset (`data/annotation/dataset_v0_draft.csv`) built, validated, and
+converted to `data/processed/dataset_v0.jsonl` via the schema in
+`src/dataset/schema.py` (`DatasetEntry`) and `src/dataset/csv_to_jsonl.py`.
+Started at 12 annotated pairs (1 per phenomenon) and was **expanded to 25
+pairs** to add repeat observations for four phenomena (Paradoxo, Antítese,
+Hipérbato, Zeugma) — see [Results](#results-embedding-spatial-drift) for why
+that expansion mattered.
 
-✅ The embedding pipeline is implemented in `src/embeddings/` and has been
-run on the pilot dataset with all three embedding models (BGE-M3, LaBSE,
-EmbeddingGemma), complete for all 12 pairs, no missing values. Results in
-[`results/phase1_embeddings/cosine_similarity_by_model.csv`](results/phase1_embeddings/cosine_similarity_by_model.csv)
-— see [results](#results-embedding-spatial-drift) below.
+✅ The embedding pipeline is implemented in `src/embeddings/` and has been run
+twice with all three embedding models (BGE-M3, LaBSE, EmbeddingGemma): once
+on the 12-pair pilot
+([`results/phase1_embeddings/cosine_similarity_by_model.csv`](results/phase1_embeddings/cosine_similarity_by_model.csv),
+preserved for comparison) and once on the expanded 25-pair dataset
+([`_v1` suffixed files](results/phase1_embeddings/cosine_similarity_by_model_v1.csv)),
+no missing values in either run. A 5-pair synthetic control set
+(`data/processed/control_baseline.jsonl`, trivial paraphrases with no
+rhetorical figure) was also run through the same pipeline to establish a
+similarity floor.
 
 An earlier phase of this project piloted an LLM interpretation-evaluation
 experiment; it was dropped from active scope and archived — see
@@ -47,54 +54,97 @@ was discontinued.
 
 ## Results: embedding spatial drift
 
-Cosine similarity between `texto_original` and `texto_simplificado`,
-averaged across the 12 pilot pairs, per model:
+The results below are presented in the order they were actually found,
+including the point where the original hypothesis stopped holding up. This
+project treats that as the process working as intended, not as a failure to
+report quietly: an initial pattern was proposed from a small sample, tested
+against a control and a possible confound, and then re-tested against more
+data — which is exactly what turned up a more robust explanation than the
+one we started with.
+
+**1. Initial hypothesis and first pattern (n=12, one pair per phenomenon).**
+The starting hypothesis was that specific rhetorical/syntactic categories —
+paradox, zeugma, antithesis, etc. — would drift by different amounts in
+embedding space. The first pilot run seemed to confirm this cleanly:
+*Paradoxo* had the lowest cosine similarity of the set (0.34–0.51 across the
+three models), *Zeugma* the highest (0.87–0.88), and all three
+architecturally unrelated models (BGE-M3, LaBSE, EmbeddingGemma) agreed on
+both extremes — a promising sign against single-model artifact.
+
+**2. Control baseline (5 synthetic trivial-paraphrase pairs).** To know
+whether that spread was meaningful, we measured a similarity "floor": pairs
+that say the same thing with no rhetorical complexity at all scored
+0.95–0.97 across models. Converting each phenomenon's similarity to a
+z-score against that floor, 11 of the 12 original phenomena deviated far
+beyond what sampling noise would explain — real signal, not an artifact of
+n=12.
+
+**3. A confound surfaces: context-dependency.** Manual review found that
+several fragments depend on context outside the excerpt to be
+fully interpretable (presuppositional connectives like "mas ainda",
+unresolved deixis, an unidentified interlocutor). Splitting the 12 pairs
+by that criterion showed a large, significant gap — context-dependent
+fragments averaged 0.57 similarity vs. 0.73 for self-contained ones
+(Mann-Whitney p≈0.004) — and 5 of the 6 "logical-pragmatic" phenomena
+(including most of the paradox examples) were also context-dependent.
+The two variables were almost completely confounded in the 12-pair set:
+there was no way yet to tell whether it was the rhetorical figure itself,
+or the missing context, doing the work.
+
+**4. Dataset expansion (12 → 25 pairs) breaks the original hierarchy.**
+Adding more Paradoxo and Antítese examples (Camões, a second Gregório de
+Matos sonnet) was the direct test of that confound. Result: the original
+hierarchy did not survive. `matos_001` (Gregório de Matos, *Paradoxo*, but
+self-contained) came out with the **highest** average similarity in the
+entire 25-pair dataset (0.889) — tied with the best Zeugma example — while
+`vieira_002` (Padre Antônio Vieira, *Paradoxo*, context-dependent) remained
+the **lowest** (0.393). Same rhetorical label, opposite ends of the
+distribution. Being "a paradox" predicts nothing on its own; whether the
+excerpt depends on context does.
+
+**5. Ruling out a simpler confound: text length.** Before accepting
+context-dependency as the explanation, we checked whether it was just a
+proxy for how much the simplified rewrite had to expand to compensate for
+what was cut. The raw character-count difference between original and
+simplified text was *not* significantly correlated with similarity, but
+the *proportional* expansion ratio (simplified length / original length)
+was — a moderate negative correlation (r≈−0.43 to −0.47, p<0.05) across
+all three models: rewrites that had to expand proportionally more tended
+to drift further from the original in embedding space.
+
+**6. Two independent factors, not one.** A multiple regression
+(`similaridade ~ razão_tamanho + dependia_contexto`) tested whether these
+two variables were really separate effects or whether one was secretly
+absorbing the other. Both stayed statistically significant when
+controlling for the other in nearly every model/term combination (R²
+0.35–0.42), with only one borderline case (EmbeddingGemma's size-ratio
+term, p≈0.05). With n=25 and 2 predictors, this is indicative, not
+conclusive — but it supports treating context-dependency and proportional
+text expansion as two distinct, mostly independent contributors.
+
+**Current working conclusion:** the rhetorical category of a fragment
+(paradox, zeugma, antithesis...) does not by itself predict how much an
+embedding "drifts" between the original and its simplified rewrite. Two
+more fundamental factors do a better job: (a) whether the excerpt depends
+on context missing from the recorded fragment, and (b) how much,
+proportionally, the simplified rewrite had to expand to compensate for
+what was cut. Mean similarity across all 25 pairs, per model, for
+reference:
 
 | Model | Mean | Std dev |
 |---|---|---|
-| BGE-M3 | 0.6899 | 0.0938 |
-| LaBSE | 0.6521 | 0.1355 |
-| EmbeddingGemma | 0.6158 | 0.1405 |
+| BGE-M3 | 0.7612 | 0.1100 |
+| LaBSE | 0.7531 | 0.1526 |
+| EmbeddingGemma | 0.7112 | 0.1445 |
 
-EmbeddingGemma has both the lowest mean and the highest variance of the
-three — it appears the most sensitive to the syntactic complexity of the
-original fragment in this pilot.
-
-By `fenomeno_linguistico` (sorted by mean similarity across the three
-models, lowest first — pilot dataset, n=1 pair per phenomenon):
-
-| Phenomenon | BGE-M3 | LaBSE | EmbeddingGemma |
-|---|---|---|---|
-| Paradoxo | 0.5067 | 0.3357 | 0.3357 |
-| Niilismo Ontológico / Não Ser | 0.5911 | 0.5519 | 0.5210 |
-| Niilismo Ontológico / Antinomia e Oximoro | 0.6373 | 0.5711 | 0.5200 |
-| Neologismo e Sarcasmo | 0.6379 | 0.5435 | 0.5805 |
-| Niilismo Fís / Estática do Nada | 0.6873 | 0.6594 | 0.5588 |
-| Niilismo Filosófico / Desconstrução Metafísica | 0.6806 | 0.7002 | 0.5401 |
-| Antítese | 0.7103 | 0.7440 | 0.5962 |
-| Eufemismo e Ironia | 0.7060 | 0.7021 | 0.7003 |
-| Metáfora Cósmica / Niilismo Físico | 0.7610 | 0.6957 | 0.6780 |
-| Paródia | 0.7118 | 0.7113 | 0.7464 |
-| Sugestão e Conotação | 0.7724 | 0.7423 | 0.7382 |
-| Zeugma | 0.8769 | 0.8681 | 0.8742 |
-
-**Cross-architecture agreement at the extremes** is the most notable
-finding so far: all three models — architecturally unrelated (BGE-M3,
-LaBSE's BERT-based dual encoder, and EmbeddingGemma's Gemma 3 backbone) —
-agree on both ends of the distribution. The lowest similarity is
-`vieira_002` (Padre Antônio Vieira, *Paradoxo*, "arte sem arte"), where
-LaBSE and EmbeddingGemma converge on the exact same value (0.3357); the
-highest is `assis_002` (Machado de Assis, *Zeugma*), where all three land
-in the 0.87–0.88 range. This convergence across independent architectures
-is evidence against a single-model artifact, in support of the project's
-core hypothesis: paradox — a phenomenon with genuine surface-level logical
-tension — appears to systematically stress embedding geometry, while
-zeugma — a purely syntactic ellipsis with no semantic ambiguity — does
-not.
-
-With n=1 pair per phenomenon, this pilot is descriptive, not statistically
-conclusive — expanding the annotated dataset is needed before drawing
-firm conclusions per phenomenon.
+Full statistical detail (z-scores, the Mann-Whitney tests, the length
+correlations, and the regression tables) is in
+`results/phase1_embeddings/` and walked through step by step in
+`notebooks/exploratory_analysis.ipynb`. With n=25 pairs total, this remains
+exploratory/hypothesis-generating rather than confirmatory — the natural
+next step is a larger dataset balanced across rhetorical category ×
+context-dependency × expansion ratio, so each factor can be tested with
+real statistical power.
 
 ## Project structure
 
@@ -160,3 +210,18 @@ python -m src.embeddings.run_phase1 --ids vieira_001 --output /tmp/test.csv
 # full run
 python -m src.embeddings.run_phase1
 ```
+
+## Open question for future work
+
+The context-dependency finding above has a practical angle worth studying
+separately: **do text chunks need to be semantically self-contained to embed
+reliably?** Several fragments in this dataset scored low similarity not
+because of their rhetorical complexity but because they presuppose context
+cut off by the excerpt boundary (an unresolved connective, deixis, an
+unidentified interlocutor). That is structurally the same problem a
+retrieval/chunking pipeline faces when it splits a document without regard
+for whether each chunk stands on its own — so the same effect measured here
+on literary fragments may be relevant to how chunk boundaries are chosen in
+RAG systems more generally. This hasn't been tested against non-literary
+text or against different chunking strategies; it's noted here as a
+follow-up question, not a claim.
