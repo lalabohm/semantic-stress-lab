@@ -210,7 +210,7 @@ python -m src.embeddings.run_phase1 --ids vieira_001 --output /tmp/test.csv
 python -m src.embeddings.run_phase1
 ```
 
-## Open question for future work
+## Final considerations
 
 The context-dependency finding above has a practical angle worth studying
 separately: **do text chunks need to be semantically self-contained to embed
@@ -221,9 +221,13 @@ unidentified interlocutor). That is structurally the same problem a
 retrieval/chunking pipeline faces when it splits a document without regard
 for whether each chunk stands on its own — so the same effect measured here
 on literary fragments may be relevant to how chunk boundaries are chosen in
-RAG systems more generally. This hasn't been tested against non-literary
-text or against different chunking strategies; it's noted here as a
-follow-up question, not a claim.
+RAG systems more generally. Anthropic's ["Contextual
+Retrieval"](https://www.anthropic.com/news/contextual-retrieval) post makes
+a closely related practical observation, and context loss and chunk-size
+tradeoffs of this kind are frequently noted in work on "semantic chunking"
+in RAG pipelines more broadly. This hasn't been tested against non-literary
+text or against different chunking strategies here; it's noted as a
+follow-up question, not a claim this project has established.
 
 ## References
 
