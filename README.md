@@ -224,3 +224,21 @@ on literary fragments may be relevant to how chunk boundaries are chosen in
 RAG systems more generally. This hasn't been tested against non-literary
 text or against different chunking strategies; it's noted here as a
 follow-up question, not a claim.
+
+## References
+
+The most directly load-bearing references for this project's methodology
+and findings. Full bibliography, grouped by which part of the methodology
+each one supports, in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md#references).
+
+- Reimers, N. & Gurevych, I. (2019). *Sentence-BERT: Sentence Embeddings
+  using Siamese BERT-Networks*. EMNLP.
+- Feng, F. et al. (2022). *Language-agnostic BERT Sentence Embedding*
+  (LaBSE). ACL.
+- Chen, J. et al. (2024). *BGE-M3: Multi-Lingual, Multi-Functionality,
+  Multi-Granularity Text Embeddings*. arXiv:2402.03216.
+- Bowman, S. R. et al. (2015). *A Large Annotated Corpus for Learning
+  Natural Language Inference* (SNLI). EMNLP.
+- Grice, H. P. (1975). *Logic and Conversation*. In Cole, P. & Morgan,
+  J. L. (eds.), *Syntax and Semantics 3: Speech Acts*. Academic Press.
+- Levinson, S. C. (1983). *Pragmatics*. Cambridge University Press.

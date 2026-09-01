@@ -138,3 +138,80 @@ implemented and has been run on the pilot dataset with all three models;
 results in `results/phase1_embeddings/cosine_similarity_by_model.csv`.
 This is currently the entire active scope of the project — see "Future
 work" above for the discontinued LLM-interpretation pilot.
+
+## References
+
+Grouped by the part of the methodology each one supports.
+
+**Sentence embeddings and semantic similarity** (Embedding Spatial Drift
+design):
+
+- Reimers, N. & Gurevych, I. (2019). *Sentence-BERT: Sentence Embeddings
+  using Siamese BERT-Networks*. EMNLP.
+- Feng, F. et al. (2022). *Language-agnostic BERT Sentence Embedding*
+  (LaBSE). ACL.
+- Chen, J. et al. (2024). *BGE-M3: Multi-Lingual, Multi-Functionality,
+  Multi-Granularity Text Embeddings*. arXiv:2402.03216.
+- Cer, D. et al. (2017). *SemEval-2017 Task 1: Semantic Textual
+  Similarity Multilingual and Crosslingual Focused Evaluation*.
+  SemEval.
+
+**Geometry of embedding space** (motivates treating cosine drift as
+possibly reflecting surface form, not just meaning):
+
+- Ethayarajh, K. (2019). *How Contextual are Contextualized Word
+  Representations?*. EMNLP.
+- Reif, E. et al. (2019). *Visualizing and Measuring the Geometry of
+  BERT*. NeurIPS.
+
+**Natural language inference** (basis for the bidirectional entailment
+check in the intralingual translation protocol):
+
+- Bowman, S. R. et al. (2015). *A Large Annotated Corpus for Learning
+  Natural Language Inference* (SNLI). EMNLP.
+- Williams, A., Nangia, N. & Bowman, S. R. (2018). *A Broad-Coverage
+  Challenge Corpus for Sentence Understanding through Inference*
+  (MultiNLI). NAACL.
+
+**Paraphrase and text simplification** (basis for treating the
+original/simplified pair as a controlled semantic-preservation task):
+
+- Bhagat, R. & Hovy, E. (2013). *What Is a Paraphrase?*. Computational
+  Linguistics, 39(3).
+- Alva-Manchego, F., Scarton, C. & Specia, L. (2020). *Data-Driven
+  Sentence Simplification: Survey and Benchmark*. Computational
+  Linguistics, 46(1).
+
+**Figurative language and logical contradiction** (basis for the
+"logical-pragmatic" vs. "lexical/rhetorical" phenomenon grouping):
+
+- de Marneffe, M.-C., Rafferty, A. N. & Manning, C. D. (2008). *Finding
+  Contradictions in Text*. ACL.
+- Shutova, E. (2010). *Automatic Metaphor Interpretation as a
+  Paraphrasing Task*. NAACL.
+
+**Pragmatics and context-dependency** (theoretical basis for the
+context-dependency classification behind the confound in the Results
+section — the strongest and most directly load-bearing citations in this
+list):
+
+- Grice, H. P. (1975). *Logic and Conversation*. In Cole, P. & Morgan,
+  J. L. (eds.), *Syntax and Semantics 3: Speech Acts*. Academic Press.
+- Levinson, S. C. (1983). *Pragmatics*. Cambridge University Press.
+
+**Computational literary stylistics** (motivation — connects to the
+project's origin story, see `apresentacao/`):
+
+- Kao, J. & Jurafsky, D. (2012). *A Computational Analysis of Style,
+  Affect, and Imagery in Contemporary Poetry*. NAACL Workshop on
+  Computational Linguistics for Literature.
+- Piper, A., So, R. J. & Bamman, D. (2021). *Narrative Theory for
+  Computational Narrative Understanding*. EMNLP.
+
+**Retrieval-augmented generation and chunking** (basis for the "Open
+question for future work" in the README):
+
+- Lewis, P. et al. (2020). *Retrieval-Augmented Generation for
+  Knowledge-Intensive NLP Tasks*. NeurIPS.
+- Karpukhin, V. et al. (2020). *Dense Passage Retrieval for Open-Domain
+  Question Answering*. EMNLP.
