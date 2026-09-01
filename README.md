@@ -153,7 +153,6 @@ archive/          code and data from the discontinued LLM-interpretation
                   pilot (out of active scope — see docs/METHODOLOGY.md)
 assets/           static images (e.g. project photos)
 data/
-  raw/            extracted original texts, organized by author
   processed/      final consolidated dataset (.jsonl)
   annotation/     working spreadsheets/CSVs for human review
 src/
